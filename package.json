@@ -1,0 +1,20 @@
+{
+  "name": "wow-dbc",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.13.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "nodejs-polars": "^0.18.0"
+  }
+}
