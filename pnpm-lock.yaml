@@ -11,10 +11,16 @@ importers:
       nodejs-polars:
         specifier: ^0.18.0
         version: 0.18.0
+      papaparse:
+        specifier: ^5.5.2
+        version: 5.5.2
     devDependencies:
       '@types/node':
         specifier: ^22.13.2
         version: 22.13.2
+      '@types/papaparse':
+        specifier: ^5.3.15
+        version: 5.3.15
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -23,6 +29,9 @@ packages:
 
   '@types/node@22.13.2':
     resolution: {integrity: sha512-Z+r8y3XL9ZpI2EY52YYygAFmo2/oWfNSj4BCpAXE2McAexDk8VcnBMGC9Djn9gTKt4d2T/hhXqmPzo4hfIXtTg==}
+
+  '@types/papaparse@5.3.15':
+    resolution: {integrity: sha512-JHe6vF6x/8Z85nCX4yFdDslN11d+1pr12E526X8WAfhadOeaOTx5AuIkvDKIBopfvlzpzkdMx4YyvSKCM9oqtw==}
 
   nodejs-polars-android-arm64@0.18.0:
     resolution: {integrity: sha512-ksmL8X2xsMkI9WMlzRw7Mt7csIDfNJVDlyybSDMMAfO1YWfC2aCFUroFc8UnXVK+8bIZXB7W+k1ZzTRhtSxPsQ==}
@@ -76,6 +85,9 @@ packages:
     resolution: {integrity: sha512-TN0InAOCzXS2Nrpr+8Sh9oAvILBjIoKMscz9P5XDJ+Q2F6EMb39Um9gwRzJ2kmEqYsufw6NwsafgbY41xKwVWg==}
     engines: {node: '>= 18'}
 
+  papaparse@5.5.2:
+    resolution: {integrity: sha512-PZXg8UuAc4PcVwLosEEDYjPyfWnTEhOrUfdv+3Bx+NuAb+5NhDmXzg5fHWmdCh1mP5p7JAZfFr3IMQfcntNAdA==}
+
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
@@ -89,6 +101,10 @@ snapshots:
   '@types/node@22.13.2':
     dependencies:
       undici-types: 6.20.0
+
+  '@types/papaparse@5.3.15':
+    dependencies:
+      '@types/node': 22.13.2
 
   nodejs-polars-android-arm64@0.18.0:
     optional: true
@@ -124,6 +140,8 @@ snapshots:
       nodejs-polars-linux-x64-gnu: 0.18.0
       nodejs-polars-linux-x64-musl: 0.18.0
       nodejs-polars-win32-x64-msvc: 0.18.0
+
+  papaparse@5.5.2: {}
 
   typescript@5.7.3: {}
 
