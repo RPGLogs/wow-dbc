@@ -1,6 +1,6 @@
 import type { Dbc } from "../dbc.ts";
 import type { BaseSpell } from "../types.ts";
-import { SpellSource } from "../types.ts";
+import { SpellType } from "../types.ts";
 
 interface SkillRaceClassInfo {
   ClassMask: number;
@@ -20,12 +20,13 @@ export async function classSkillLine(
   dbc: Dbc,
   classId: number,
 ): Promise<number | undefined> {
-  const skillRaceClassInfo =
-    await dbc.getTable<SkillRaceClassInfo>("SkillRaceClassInfo");
-  return skillRaceClassInfo.find(
-    ({ Flags, ClassMask }) =>
-      Flags === CLASS_SKILL_FLAGS && ClassMask === 2 ** (classId - 1),
-  )?.SkillID;
+  const skillRaceClassInfo = await dbc.loadTable<SkillRaceClassInfo>(
+    "SkillRaceClassInfo",
+    "Flags",
+  );
+  return skillRaceClassInfo
+    .getAll(CLASS_SKILL_FLAGS)
+    .find(({ ClassMask }) => ClassMask === 2 ** (classId - 1))?.SkillID;
 }
 
 export default async function classSpells(
@@ -37,9 +38,11 @@ export default async function classSpells(
     return [];
   }
 
-  const skillLineAbilities =
-    await dbc.getTable<SkillLineAbility>("SkillLineAbility");
+  const skillLineAbilities = await dbc.loadTable<SkillLineAbility>(
+    "SkillLineAbility",
+    "SkillLine",
+  );
   return skillLineAbilities
-    .filter(({ SkillLine }) => SkillLine === skillLineId)
-    .map(({ Spell }) => ({ id: Spell, source: SpellSource.Class }));
+    .getAll(skillLineId)
+    .map(({ Spell }) => ({ id: Spell, type: SpellType.Class }));
 }

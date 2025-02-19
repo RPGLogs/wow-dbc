@@ -4,13 +4,17 @@ interface Output {
   name: string;
 }
 
+interface SpellName {
+  ID: number;
+  Name_lang: string;
+}
+
 export default hydrater({
   name: "name",
-  async hydrate(dbc, input): Promise<Output> {
-    const names = await dbc.getTable<{ ID: number; Name_lang: string }>(
-      "SpellName",
-    );
-    const name = names.find(({ ID }) => ID === input.id)?.Name_lang;
+  tables: [{ name: "SpellName", key: "ID" }],
+  hydrate(dbc, input): Output {
+    const names = dbc.getTable<SpellName, "ID">("SpellName", "ID");
+    const name = names.getFirst(input.id)?.Name_lang;
     return {
       name: name ?? "Unknown",
     };

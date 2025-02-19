@@ -1,12 +1,19 @@
 import fs from "node:fs/promises";
-import pp from "papaparse";
 import path from "node:path";
+import * as udsv from "udsv";
 
 /**
  * Handle for dbc table lookup.
  */
 export interface Dbc {
-  getTable<T extends Record<string, any>>(name: string): Promise<T[]>;
+  loadTable<T extends Record<string, any>, Key extends keyof T = keyof T>(
+    name: string,
+    key: Key,
+  ): Promise<Table<T, Key>>;
+  getTable<T extends Record<string, any>, Key extends keyof T = keyof T>(
+    name: string,
+    key: Key,
+  ): Table<T, Key>;
   buildVersion: string;
 }
 
@@ -59,43 +66,52 @@ async function getTableData(
   return body;
 }
 
-class ParseError extends Error {
-  public readonly parseErrors: pp.ParseError[];
-  constructor(name: string, errors: pp.ParseError[]) {
-    super(`Unable to parse DBC file ${name} from CSV`);
-    this.parseErrors = errors;
+export class Table<T extends Record<string, any>, K extends keyof T> {
+  private readonly data: Map<T[K], T[]>;
+  public readonly key: K;
+
+  constructor(data: T[], key: K) {
+    this.key = key;
+    this.data = keyByMultiple(data, key);
+  }
+
+  getFirst(index: T[K]): T | undefined {
+    return this.data.get(index)?.[0];
+  }
+
+  getAll(index: T[K]): T[] {
+    return this.data.get(index) ?? [];
   }
 }
 
-const MEMORY_CACHE = {};
-
-async function getTable<T extends Record<string, unknown>>(
+async function getTable<T extends Record<string, any>>(
   name: string,
   buildVersion: string,
 ): Promise<Array<T>> {
-  const memoryCacheKey = `${name}-${buildVersion}`;
-  if (MEMORY_CACHE[memoryCacheKey]) {
-    return MEMORY_CACHE[memoryCacheKey];
-  }
   const rawCsv = await getTableData(name, buildVersion);
-  const result = pp.parse<T>(rawCsv, {
-    header: true,
-    dynamicTyping: true,
-    download: false,
-    quoteChar: '"',
-    skipEmptyLines: true, // last line is empty
-  });
-  if (result.errors.length > 0) {
-    throw new ParseError(name, result.errors);
-  }
-  MEMORY_CACHE[memoryCacheKey] = result.data;
-  return result.data;
+  const schema = udsv.inferSchema(rawCsv);
+  const parser = udsv.initParser(schema);
+  return parser.typedObjs(rawCsv);
 }
 
 export function dbc(buildVersion: string): Dbc {
+  const cache: Record<string, Table<any, any>> = {};
   return {
-    getTable<T extends Record<string, unknown>>(name: string) {
-      return getTable<T>(name, buildVersion);
+    getTable(name, key) {
+      const cacheKey = `${name}-${String(key)}`;
+      if (!cache[cacheKey]) {
+        throw new Error("unable to retrieve cached table " + cacheKey);
+      }
+      return cache[cacheKey];
+    },
+    async loadTable(name, key) {
+      const cacheKey = `${name}-${String(key)}`;
+      if (cache[cacheKey]) {
+        return cache[cacheKey];
+      }
+      const records = await getTable(name, buildVersion);
+      cache[cacheKey] = new Table(records, key as string);
+      return cache[cacheKey];
     },
     buildVersion,
   };
@@ -130,28 +146,4 @@ export function keyByMultiple<T, K extends keyof T>(
     result.get(record[key]).push(record);
   }
   return result;
-}
-
-/**
- * Simple left join helper for DBC data. Assumes that keys are unique (so not compatible with SpellEffect)
- */
-export function leftJoin<
-  T1 extends Record<string, any>,
-  T2 extends Record<string, any>,
-  K1 extends keyof T1,
-  K2 extends keyof T2,
->(
-  left: T1[],
-  leftKey: K1,
-  right: T2[],
-  rightKey: K2,
-): Array<{ left: T1; right: T2 | undefined }> {
-  const rightLookup = keyBy(right, rightKey);
-  return left.map((leftVal) => {
-    const rightVal = rightLookup.get(leftVal[leftKey] as unknown as T2[K2]);
-    return {
-      left: leftVal,
-      right: rightVal,
-    };
-  });
 }

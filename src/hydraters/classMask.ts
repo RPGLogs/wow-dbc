@@ -15,10 +15,13 @@ interface SpellClassOptions {
 
 export default hydrater({
   name: "classMask",
-  async hydrate(dbc, input): Promise<Output> {
-    const spellClassOptions =
-      await dbc.getTable<SpellClassOptions>("SpellClassOptions");
-    const options = spellClassOptions.find((opt) => opt.SpellID === input.id);
+  tables: [{ name: "SpellClassOptions", key: "SpellID" }],
+  hydrate(dbc, input): Output {
+    const spellClassOptions = dbc.getTable<SpellClassOptions>(
+      "SpellClassOptions",
+      "SpellID",
+    );
+    const options = spellClassOptions.getFirst(input.id);
 
     if (options) {
       return {

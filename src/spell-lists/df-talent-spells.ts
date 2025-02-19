@@ -1,5 +1,5 @@
-import { keyBy, leftJoin, type Dbc } from "../dbc.ts";
-import { SpellSource, type BaseSpell } from "../types.ts";
+import { type Dbc } from "../dbc.ts";
+import { SpellType, type BaseSpell } from "../types.ts";
 import { classSkillLine } from "./class-spells.ts";
 
 interface TalentSpell extends BaseSpell {
@@ -51,73 +51,85 @@ export default async function dragonflightTalentSpells(
     return [];
   }
 
-  const skillLineToTraitTree = await dbc.getTable<SkillLineXTraitTree>(
+  const skillLineToTraitTree = await dbc.loadTable<SkillLineXTraitTree>(
     "SkillLineXTraitTree",
+    "SkillLineID",
   );
-  const traitTreeID = skillLineToTraitTree.find(
-    ({ SkillLineID }) => SkillLineID === skillLineId,
-  )?.TraitTreeID;
+  const traitTreeID = skillLineToTraitTree.getFirst(skillLineId)?.TraitTreeID;
 
   if (!traitTreeID) {
     return [];
   }
 
-  const traitLoadouts =
-    await dbc.getTable<TraitTreeLoadout>("TraitTreeLoadout");
-  const traitLoadoutId = traitLoadouts.find(
-    ({ TraitTreeID, ChrSpecializationID }) =>
-      TraitTreeID === traitTreeID && ChrSpecializationID === specId,
-  )?.ID;
+  const traitLoadouts = await dbc.loadTable<TraitTreeLoadout>(
+    "TraitTreeLoadout",
+    "ChrSpecializationID",
+  );
+  const traitLoadoutId = traitLoadouts
+    .getAll(specId)
+    .find(({ TraitTreeID }) => TraitTreeID === traitTreeID)?.ID;
 
   if (!traitLoadoutId) {
     return [];
   }
 
-  const traitTreeLoadoutEntries = await dbc.getTable<TraitTreeLoadoutEntry>(
+  const traitTreeLoadoutEntries = await dbc.loadTable<TraitTreeLoadoutEntry>(
     "TraitTreeLoadoutEntry",
+    "TraitTreeLoadoutID",
   );
-  const loadoutNodes = traitTreeLoadoutEntries.filter(
-    ({ TraitTreeLoadoutID }) => TraitTreeLoadoutID === traitLoadoutId,
+  const loadoutNodes = traitTreeLoadoutEntries.getAll(traitLoadoutId);
+
+  const traitNodesToEntries = await dbc.loadTable<
+    TraitNodeXTraitNodeEntry,
+    "TraitNodeID"
+  >("TraitNodeXTraitNodeEntry", "TraitNodeID");
+  const traitEntries = await dbc.loadTable<TraitNodeEntry>(
+    "TraitNodeEntry",
+    "ID",
+  );
+  const traitDefinitions = await dbc.loadTable<TraitDefinition>(
+    "TraitDefinition",
+    "ID",
   );
 
-  const traitNodesToEntries = await dbc.getTable<TraitNodeXTraitNodeEntry>(
-    "TraitNodeXTraitNodeEntry",
-  );
-  const traitEntries = await dbc.getTable<TraitNodeEntry>("TraitNodeEntry");
-  const traitDefinitions =
-    await dbc.getTable<TraitDefinition>("TraitDefinition");
-  const specEntries = leftJoin(
-    traitNodesToEntries,
-    "TraitNodeEntryID",
-    traitEntries,
-    "ID",
-  )
-    .filter(({ right }) => right !== undefined)
-    .map(({ right }) => right);
-  const allEntries = leftJoin(
-    specEntries,
-    "TraitDefinitionID",
-    traitDefinitions,
-    "ID",
-  )
-    .filter(({ right }) => right !== undefined)
-    .filter(({ right: { SpellID } }) => SpellID > 0)
-    .map(
-      ({
-        left: { ID },
-        right: { SpellID, VisibleSpellID, OverridesSpellID },
-      }) => ({
-        id: SpellID,
-        requiresTalentEntry: [ID],
-        visibleSpellId: VisibleSpellID > 0 ? VisibleSpellID : undefined,
-        overrides: OverridesSpellID > 0 ? OverridesSpellID : undefined,
-        source: SpellSource.Talent,
-      }),
-    );
+  const specEntries = loadoutNodes
+    .flatMap((node) => {
+      const entryLinks = traitNodesToEntries.getAll(node.SelectedTraitNodeID);
+      if (entryLinks.length === 0) {
+        return [];
+      }
+
+      return entryLinks.map((entryLink) => {
+        const entry = traitEntries.getFirst(entryLink.TraitNodeEntryID);
+        if (!entry) {
+          return undefined;
+        }
+
+        const definition = traitDefinitions.getFirst(entry.TraitDefinitionID);
+
+        if (!definition) {
+          return undefined;
+        }
+        return {
+          id: definition.SpellID,
+          requiresTalentEntry: [entry.ID],
+          visibleSpellId:
+            definition.VisibleSpellID > 0
+              ? definition.VisibleSpellID
+              : undefined,
+          overrides:
+            definition.OverridesSpellID > 0
+              ? definition.OverridesSpellID
+              : undefined,
+          type: SpellType.Talent,
+        };
+      });
+    })
+    .filter((record) => record !== undefined);
 
   // now we have to handle spells that show up repeatedly
   const result: Map<number, TalentSpell> = new Map();
-  for (const entry of allEntries) {
+  for (const entry of specEntries) {
     if (!result.has(entry.id)) {
       result.set(entry.id, entry);
     } else {

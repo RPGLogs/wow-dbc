@@ -22,24 +22,23 @@ interface SpellMisc {
 
 export default hydrater({
   name: "passive",
-  cache: undefined,
-  dependencies: { name },
-  async hydrate(dbc, input): Promise<Output> {
+  tables: [
+    {
+      name: "SpellMisc",
+      key: "SpellID",
+    },
+  ],
+  hydrate(dbc, input): Output {
     // spellmisc is really big so we are putting extra effort into not re-keying it.
-    const spellMisc: Map<number, SpellMisc> = this.cache
-      ? this.cache
-      : keyBy(await dbc.getTable<SpellMisc>("SpellMisc"), "SpellID");
-    if (!this.cache) {
-      this.cache = spellMisc;
-    }
+    const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
 
-    if (!spellMisc.has(input.id)) {
+    if (!spellMisc.getFirst(input.id)) {
       return {
         passive: false,
       };
     }
 
-    const { Attributes_0, Attributes_4, Attributes_8 } = spellMisc.get(
+    const { Attributes_0, Attributes_4, Attributes_8 } = spellMisc.getFirst(
       input.id,
     );
 

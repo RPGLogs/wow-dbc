@@ -1,5 +1,5 @@
 import type { Dbc } from "../dbc.ts";
-import { SpellSource, type BaseSpell } from "../types.ts";
+import { SpellType, type BaseSpell } from "../types.ts";
 
 interface SpecializationSpell {
   SpecID: number;
@@ -16,14 +16,15 @@ export default async function specSpells(
   dbc: Dbc,
   specId: number,
 ): Promise<BaseSpell[]> {
-  const specializationSpells = await dbc.getTable<SpecializationSpell>(
+  const specializationSpells = await dbc.loadTable<SpecializationSpell>(
     "SpecializationSpells",
+    "SpecID",
   );
   return specializationSpells
-    .filter(({ SpecID }) => SpecID === specId)
+    .getAll(specId)
     .map(({ SpellID, OverridesSpellID }) => ({
       id: SpellID,
-      source: SpellSource.Spec,
+      type: SpellType.Spec,
       overrides: OverridesSpellID > 0 ? OverridesSpellID : undefined,
     }));
 }
