@@ -12,6 +12,8 @@ import { doHydration } from "./src/types.ts";
 import charges from "./src/hydraters/charges.ts";
 import cooldown from "./src/hydraters/cooldown.ts";
 import label from "./src/hydraters/label.ts";
+import channel from "./src/hydraters/channel.ts";
+import castTime from "./src/hydraters/castTime.ts";
 
 const RETAIL_VERSION = "11.1.0.59095";
 
@@ -37,6 +39,8 @@ const result = await doHydration(
     charges,
     cooldown,
     label,
+    channel,
+    castTime,
   },
   retail,
   spellList,
@@ -45,7 +49,7 @@ const result = await doHydration(
 console.log(
   JSON.stringify(
     result.filter(
-      (spell) => spell.name === "Fortifying Brew" || spell.id === 388813,
+      (spell) => spell.name === "Chi Burst" || spell.name === "Expel Harm",
     ),
     null,
     2,

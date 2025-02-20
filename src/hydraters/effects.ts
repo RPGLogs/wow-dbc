@@ -13,6 +13,8 @@ export interface SpellEffect {
   misc1: number;
   basePoints: number;
   pointModifiers?: Record<number, number>;
+  period?: number;
+  triggeredSpell?: number;
 }
 
 interface Output {
@@ -27,9 +29,11 @@ interface SpellEffectRaw {
   EffectSpellClassMask_2: number;
   EffectSpellClassMask_3: number;
   EffectAura: number;
+  EffectAuraPeriod: number;
   EffectMiscValue_0: number;
   EffectMiscValue_1: number;
   EffectBasePointsF: number;
+  EffectTriggerSpell: number;
 }
 
 export default hydrater({
@@ -71,6 +75,11 @@ export default hydrater({
 
         const modifiers = pointModifiers(spell, effect, spellEffect, spellList);
 
+        const period =
+          effect.EffectAuraPeriod > 0 ? effect.EffectAuraPeriod : undefined;
+        const triggeredSpell =
+          effect.EffectTriggerSpell > 0 ? effect.EffectTriggerSpell : undefined;
+
         outputEffects.push({
           sourceSpellId: spell.id,
           aura: effect.EffectAura,
@@ -78,6 +87,8 @@ export default hydrater({
           misc0: effect.EffectMiscValue_0,
           misc1: effect.EffectMiscValue_1,
           pointModifiers: modifiers,
+          period,
+          triggeredSpell,
         });
       }
     }
@@ -104,6 +115,7 @@ function matchesCategory(
 
 // see: https://github.com/Marlamin/wow.tools.local/blob/d9872d652157b720a24cc7db96543d01a7d50b29/wwwroot/js/enums.js#L1698
 export enum EffectType {
+  PERIODIC_TRIGGER_SPELL = 23,
   ADD_FLAT_MODIFIER = 107,
   ADD_FLAT_MODIFIER_BY_SPELL_LABEL = 219,
   MOD_MAX_CHARGES = 411,
