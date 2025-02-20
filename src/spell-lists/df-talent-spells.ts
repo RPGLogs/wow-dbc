@@ -14,10 +14,27 @@ interface SkillLineXTraitTree {
   TraitTreeID: number;
 }
 
+interface TraitCond {
+  ID: number;
+  SpecSetID: number;
+  TraitNodeID: number;
+  TraitTreeID: number;
+}
+
+interface TraitNodeXTraitCond {
+  TraitNodeID: number;
+  TraitCondID: number;
+}
+
 interface TraitTreeLoadout {
   TraitTreeID: number;
   ChrSpecializationID: number;
   ID: number;
+}
+
+interface SpecSetMember {
+  SpecSet: number;
+  ChrSpecializationID: number;
 }
 
 interface TraitTreeLoadoutEntry {
@@ -28,6 +45,11 @@ interface TraitTreeLoadoutEntry {
 interface TraitNodeXTraitNodeEntry {
   TraitNodeID: number;
   TraitNodeEntryID: number;
+}
+
+interface TraitNode {
+  ID: number;
+  TraitTreeID: number;
 }
 
 interface TraitNodeEntry {
@@ -61,23 +83,31 @@ export default async function dragonflightTalentSpells(
     return [];
   }
 
-  const traitLoadouts = await dbc.loadTable<TraitTreeLoadout>(
-    "TraitTreeLoadout",
-    "ChrSpecializationID",
-  );
-  const traitLoadoutId = traitLoadouts
-    .getAll(specId)
-    .find(({ TraitTreeID }) => TraitTreeID === traitTreeID)?.ID;
+  const traitNodes = await dbc.loadTable<TraitNode>("TraitNode", "TraitTreeID");
+  const allNodes = traitNodes.getAll(traitTreeID);
 
-  if (!traitLoadoutId) {
-    return [];
-  }
-
-  const traitTreeLoadoutEntries = await dbc.loadTable<TraitTreeLoadoutEntry>(
-    "TraitTreeLoadoutEntry",
-    "TraitTreeLoadoutID",
+  const traitCond = await dbc.loadTable<TraitCond>("TraitCond", "ID");
+  const traitNodesToConds = await dbc.loadTable<TraitNodeXTraitCond>(
+    "TraitNodeXTraitCond",
+    "TraitNodeID",
   );
-  const loadoutNodes = traitTreeLoadoutEntries.getAll(traitLoadoutId);
+  const specSetMember = await dbc.loadTable<SpecSetMember>(
+    "SpecSetMember",
+    "SpecSet",
+  );
+
+  const specNodes = allNodes.filter((node) => {
+    const link = traitNodesToConds.getFirst(node.ID);
+    if (!link) {
+      // guesswork. unconditional
+      return true;
+    }
+    const cond = traitCond.getFirst(link.TraitCondID);
+    // not sure what to check besides spec set at this stage
+    return specSetMember
+      .getAll(cond.SpecSetID)
+      .some((member) => member.ChrSpecializationID === specId);
+  });
 
   const traitNodesToEntries = await dbc.loadTable<
     TraitNodeXTraitNodeEntry,
@@ -92,9 +122,9 @@ export default async function dragonflightTalentSpells(
     "ID",
   );
 
-  const specEntries = loadoutNodes
+  const specEntries = specNodes
     .flatMap((node) => {
-      const entryLinks = traitNodesToEntries.getAll(node.SelectedTraitNodeID);
+      const entryLinks = traitNodesToEntries.getAll(node.ID);
       if (entryLinks.length === 0) {
         return [];
       }
