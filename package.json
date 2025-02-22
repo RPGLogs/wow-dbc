@@ -1,15 +1,12 @@
 {
-  "name": "wow-dbc",
+  "name": "@archon/wow-dbc",
   "version": "1.0.0",
   "type": "module",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "index.ts",
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "@types/node": "^22.13.2",
     "typescript": "^5.7.3"

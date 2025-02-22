@@ -82,6 +82,10 @@ export class Table<T extends Record<string, any>, K extends keyof T> {
   getAll(index: T[K]): T[] {
     return this.data.get(index) ?? [];
   }
+
+  contents(): T[] {
+    return Array.from(this.data.values()).flat();
+  }
 }
 
 async function getTable<T extends Record<string, any>>(

@@ -1,5 +1,5 @@
 import type { Table } from "../dbc.ts";
-import { hydrater, SpellType, type BaseSpell } from "../types.ts";
+import { hydrater, SpellType, type BaseSpell } from "./internal/types.ts";
 import type { SpellCategories } from "./charges.ts";
 import classMask, { matchesClassMask } from "./classMask.ts";
 import label from "./label.ts";

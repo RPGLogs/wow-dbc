@@ -1,5 +1,5 @@
 import type { Dbc } from "../dbc.ts";
-import type { BaseSpell } from "../types.ts";
+import type { BaseSpell } from "../hydraters/internal/types.ts";
 
 interface LearnedSpell extends BaseSpell {
   taughtBy: number;

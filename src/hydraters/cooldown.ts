@@ -1,4 +1,4 @@
-import { hydrater } from "../types.ts";
+import { hydrater } from "./internal/types.ts";
 import charges from "./charges.ts";
 import type { WithModifiers } from "./effects.ts";
 import effects, {

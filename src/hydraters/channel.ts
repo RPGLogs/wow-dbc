@@ -1,4 +1,4 @@
-import { hydrater } from "../types.ts";
+import { hydrater } from "./internal/types.ts";
 import effects, { EffectType } from "./effects.ts";
 
 interface Output {
@@ -50,7 +50,7 @@ export default hydrater({
     const spellDuration = dbc.getTable<SpellDuration>("SpellDuration", "ID");
     const duration = spellDuration.getFirst(misc.DurationIndex);
     if (!duration) {
-      throw new Error(`no duration found for channeled spell ${input.id}`);
+      console.warn(`no duration found for channeled spell ${input.id}`);
     }
 
     // there are two separate flags. one for the periodic trigger being hasted, and one for the duration being hasted.
@@ -75,7 +75,7 @@ export default hydrater({
 
     return {
       channel: {
-        duration: duration.Duration,
+        duration: duration?.Duration ?? -1,
         hasted,
         buffIsLogged,
         triggeredSpells,

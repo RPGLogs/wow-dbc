@@ -1,57 +1,93 @@
-import { dbc } from "./src/dbc.ts";
-import classMask from "./src/hydraters/classMask.ts";
+import type { Dbc } from "./src/dbc.ts";
+import castTime from "./src/hydraters/castTime.ts";
+import channel from "./src/hydraters/channel.ts";
+import charges from "./src/hydraters/charges.ts";
+import cooldown from "./src/hydraters/cooldown.ts";
 import gcd from "./src/hydraters/gcd.ts";
+import {
+  doHydration,
+  type FinalOutput,
+  type Hydrater,
+} from "./src/hydraters/index.ts";
+import type { BaseSpell } from "./src/hydraters/internal/types.ts";
 import name from "./src/hydraters/name.ts";
 import passive from "./src/hydraters/passive.ts";
-import effects from "./src/hydraters/effects.ts";
 import classSpells from "./src/spell-lists/class-spells.ts";
 import dragonflightTalentSpells from "./src/spell-lists/df-talent-spells.ts";
 import learnedSpells from "./src/spell-lists/learned-spells.ts";
 import specSpells from "./src/spell-lists/spec-spells.ts";
-import { doHydration } from "./src/types.ts";
-import charges from "./src/hydraters/charges.ts";
-import cooldown from "./src/hydraters/cooldown.ts";
-import label from "./src/hydraters/label.ts";
-import channel from "./src/hydraters/channel.ts";
-import castTime from "./src/hydraters/castTime.ts";
+export { dbc } from "./src/dbc.ts";
 
-const RETAIL_VERSION = "11.1.0.59095";
+const retailSpellPreset = {
+  castTime,
+  channel,
+  charges,
+  cooldown,
+  gcd,
+  name,
+  passive,
+};
 
-const retail = dbc(RETAIL_VERSION);
+export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
+export type HydraterDefinition = Record<string, Hydrater<any, any>>;
 
-let spellList = (
-  await Promise.all([
-    classSpells(retail, 10),
-    specSpells(retail, 268),
-    dragonflightTalentSpells(retail, 10, 268),
-  ])
-).flat();
+export const PRESETS = {
+  RETAIL: retailSpellPreset,
+} satisfies Record<string, HydraterDefinition>;
 
-spellList = spellList.concat(await learnedSpells(retail, spellList));
+export async function loadAll<H extends HydraterDefinition>(
+  hydraterDef: H,
+  dbc: Dbc,
+  spellList: BaseSpell[],
+): Promise<FinalOutput<H>[]> {
+  return doHydration(hydraterDef, dbc, spellList);
+}
 
-const result = await doHydration(
-  {
-    name,
-    classMask,
-    passive,
-    effects,
-    gcd,
-    charges,
-    cooldown,
-    label,
-    channel,
-    castTime,
-  },
-  retail,
-  spellList,
-);
+async function getClassId(
+  dbc: Dbc,
+  specId: number,
+): Promise<number | undefined> {
+  const chrSpec = await dbc.loadTable<{ ID: number; ClassID: number }>(
+    "ChrSpecialization",
+    "ID",
+  );
+  return chrSpec.getFirst(specId)?.ClassID;
+}
 
-console.log(
-  JSON.stringify(
-    result.filter(
-      (spell) => spell.name === "Chi Burst" || spell.name === "Expel Harm",
-    ),
-    null,
-    2,
-  ),
-);
+export async function retailSpecList(dbc: Dbc): Promise<number[]> {
+  const [chrClasses, chrSpec] = await Promise.all([
+    dbc.loadTable<{ ID: number; Flags: number }>("ChrClasses", "ID"),
+    dbc.loadTable<{ ID: number; ClassID: number }>("ChrSpecialization", "ID"),
+  ]);
+
+  return chrSpec
+    .contents()
+    .filter((spec) => {
+      const class_ = chrClasses.getFirst(spec.ClassID);
+      const flags = class_?.Flags ?? 0;
+      return flags & PLAYER_CLASS_FLAG;
+    })
+    .map((spec) => spec.ID);
+}
+
+const PLAYER_CLASS_FLAG = 0x2;
+
+export async function retailSpellList(
+  dbc: Dbc,
+  specId: number,
+): Promise<BaseSpell[]> {
+  const classId = await getClassId(dbc, specId);
+  if (!classId) {
+    throw new Error(`unable to retrieve class for spec id ${specId}`);
+  }
+
+  const spellLists = await Promise.all([
+    classSpells(dbc, classId),
+    specSpells(dbc, specId),
+    dragonflightTalentSpells(dbc, classId, specId),
+  ]);
+
+  const spellList = spellLists.flat();
+
+  return spellList.concat(await learnedSpells(dbc, spellList));
+}

@@ -1,4 +1,4 @@
-import { hydrater, SpellType } from "../types.ts";
+import { hydrater } from "./internal/types.ts";
 import passive from "./passive.ts";
 import effects, {
   EffectMiscValue,
@@ -19,6 +19,7 @@ interface Gcd {
 
 interface SpellCategories {
   SpellID: number;
+  DefenseType: number;
   StartRecoveryCategory: number;
 }
 
@@ -28,11 +29,17 @@ interface SpellCooldowns {
   StartRecoveryTime: number;
 }
 
+interface SpellMisc {
+  SpellID: number;
+  Attributes_0: number;
+}
+
 export default hydrater({
   name: "gcd",
   tables: [
     { name: "SpellCategories", key: "SpellID" },
     { name: "SpellCooldowns", key: "SpellID" },
+    { name: "SpellMisc", key: "SpellID" },
   ],
   dependencies: { effects, passive },
   hydrate(dbc, input, spellList): Output {
@@ -52,8 +59,19 @@ export default hydrater({
       "SpellCooldowns",
       "SpellID",
     );
-
     const cooldown = spellCooldown.getFirst(input.id);
+
+    const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
+    const misc = spellMisc.getFirst(input.id);
+
+    const attr0 = misc.Attributes_0 ?? 0;
+    const isMeleeOrRangedOrAbility =
+      category.DefenseType === DefenseType.Melee ||
+      category.DefenseType === DefenseType.Ranged ||
+      (attr0 & IS_ABILITY_FLAG) > 0 ||
+      (attr0 & USES_RANGED_WEAPON_FLAG) > 0;
+
+    const defaultHasted = !isMeleeOrRangedOrAbility;
 
     const baseGcd =
       cooldown && cooldown.StartRecoveryTime > 0
@@ -63,7 +81,7 @@ export default hydrater({
     const gcd = effectWithModifiers<Gcd>(
       spellList,
       input,
-      { duration: baseGcd, hasted: false },
+      { duration: baseGcd, hasted: defaultHasted },
       (acc, effect) => {
         const duration = effectGcdReduction(effect);
         const hasted = hastesGcd(effect);
@@ -103,3 +121,10 @@ function effectGcdReduction(effect: SpellEffect): number {
 function hastesGcd(effect: SpellEffect): boolean {
   return effect.aura === EffectType.MOD_GCD_BY_HASTE;
 }
+
+enum DefenseType {
+  Melee = 2,
+  Ranged = 3,
+}
+const IS_ABILITY_FLAG = 0x10;
+const USES_RANGED_WEAPON_FLAG = 0x2;

@@ -1,5 +1,4 @@
-import type { InputType } from "node:zlib";
-import { hydrater } from "../types.ts";
+import { hydrater } from "./internal/types.ts";
 
 interface Output {
   classMask?: [number, number, number, number];

@@ -1,5 +1,5 @@
 import { type Dbc } from "../dbc.ts";
-import { SpellType, type BaseSpell } from "../types.ts";
+import { SpellType, type BaseSpell } from "../hydraters/internal/types.ts";
 import { classSkillLine } from "./class-spells.ts";
 
 interface TalentSpell extends BaseSpell {

@@ -1,5 +1,9 @@
-import { hydrater } from "../types.ts";
-import effects, { effectWithModifiers, type WithModifiers } from "./effects.ts";
+import { hydrater } from "./internal/types.ts";
+import effects, {
+  EffectType,
+  effectWithModifiers,
+  type WithModifiers,
+} from "./effects.ts";
 import passive from "./passive.ts";
 
 interface Output {
@@ -68,12 +72,13 @@ export default hydrater({
       },
     );
 
+    // TODO: hasted cooldown with charges
     const cooldown = effectWithModifiers<Cooldown>(
       spellList,
       input,
       { duration: categoryDefinition.ChargeRecoveryTime },
       (acc, effect) => {
-        if (effect.aura !== 454) {
+        if (effect.aura !== EffectType.CHARGE_RECOVERY_MULTIPLIER) {
           return acc;
         }
         return {

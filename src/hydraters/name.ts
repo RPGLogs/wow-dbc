@@ -1,4 +1,4 @@
-import { hydrater } from "../types.ts";
+import { hydrater } from "./internal/types.ts";
 
 interface Output {
   name: string;

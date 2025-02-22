@@ -1,6 +1,6 @@
 import type { Dbc } from "../dbc.ts";
-import type { BaseSpell } from "../types.ts";
-import { SpellType } from "../types.ts";
+import type { BaseSpell } from "../hydraters/internal/types.ts";
+import { SpellType } from "../hydraters/internal/types.ts";
 
 interface SkillRaceClassInfo {
   ClassMask: number;

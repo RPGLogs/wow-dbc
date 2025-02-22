@@ -1,6 +1,4 @@
-import { keyBy } from "../dbc.ts";
-import { hydrater } from "../types.ts";
-import name from "./name.ts";
+import { hydrater } from "./internal/types.ts";
 
 interface Output {
   /**
