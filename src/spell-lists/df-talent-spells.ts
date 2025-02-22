@@ -1,13 +1,10 @@
 import { type Dbc } from "../dbc.ts";
-import { SpellType, type BaseSpell } from "../hydraters/internal/types.ts";
+import {
+  SpellType,
+  type AnySpell,
+  type TalentSpell,
+} from "../hydraters/internal/types.ts";
 import { classSkillLine } from "./class-spells.ts";
-
-interface TalentSpell extends BaseSpell {
-  requiresTalentEntry: number[];
-  // TODO
-  visibleSpellId?: number;
-  overrides?: number;
-}
 
 interface SkillLineXTraitTree {
   SkillLineID: number;
@@ -19,6 +16,7 @@ interface TraitCond {
   SpecSetID: number;
   TraitNodeID: number;
   TraitTreeID: number;
+  CondType: number;
 }
 
 interface TraitNodeXTraitCond {
@@ -26,20 +24,19 @@ interface TraitNodeXTraitCond {
   TraitCondID: number;
 }
 
-interface TraitTreeLoadout {
-  TraitTreeID: number;
-  ChrSpecializationID: number;
-  ID: number;
+interface TraitNodeGroupXTraitNode {
+  TraitNodeGroupID: number;
+  TraitNodeID: number;
+}
+
+interface TraitNodeGroupXTraitCond {
+  TraitNodeGroupID: number;
+  TraitCondID: number;
 }
 
 interface SpecSetMember {
   SpecSet: number;
   ChrSpecializationID: number;
-}
-
-interface TraitTreeLoadoutEntry {
-  TraitTreeLoadoutID: number;
-  SelectedTraitNodeID: number;
 }
 
 interface TraitNodeXTraitNodeEntry {
@@ -91,6 +88,14 @@ export default async function dragonflightTalentSpells(
     "TraitNodeXTraitCond",
     "TraitNodeID",
   );
+  const traitNodesToGroups = await dbc.loadTable<TraitNodeGroupXTraitNode>(
+    "TraitNodeGroupXTraitNode",
+    "TraitNodeID",
+  );
+  const traitGroupsToConds = await dbc.loadTable<TraitNodeGroupXTraitCond>(
+    "TraitNodeGroupXTraitCond",
+    "TraitNodeGroupID",
+  );
   const specSetMember = await dbc.loadTable<SpecSetMember>(
     "SpecSetMember",
     "SpecSet",
@@ -129,6 +134,17 @@ export default async function dragonflightTalentSpells(
         return [];
       }
 
+      const group = traitNodesToGroups.getAll(node.ID);
+      const isGranted = group
+        .flatMap((g) => traitGroupsToConds.getAll(g.TraitNodeGroupID))
+        .flatMap((link) => traitCond.getAll(link.TraitCondID))
+        .filter((cond) => cond.CondType === COND_GRANTED)
+        .some((cond) =>
+          specSetMember
+            .getAll(cond.SpecSetID)
+            .some((member) => member.ChrSpecializationID === specId),
+        );
+
       return entryLinks.map((entryLink) => {
         const entry = traitEntries.getFirst(entryLink.TraitNodeEntryID);
         if (!entry) {
@@ -142,6 +158,7 @@ export default async function dragonflightTalentSpells(
         }
         return {
           id: definition.SpellID,
+          granted: isGranted,
           requiresTalentEntry: [entry.ID],
           visibleSpellId:
             definition.VisibleSpellID > 0
@@ -151,7 +168,7 @@ export default async function dragonflightTalentSpells(
             definition.OverridesSpellID > 0
               ? definition.OverridesSpellID
               : undefined,
-          type: SpellType.Talent,
+          type: SpellType.Talent as const,
         };
       });
     })
@@ -171,3 +188,5 @@ export default async function dragonflightTalentSpells(
 
   return Array.from(result.values());
 }
+
+const COND_GRANTED = 2;

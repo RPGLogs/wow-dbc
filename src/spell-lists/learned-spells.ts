@@ -1,9 +1,9 @@
 import type { Dbc } from "../dbc.ts";
-import type { BaseSpell } from "../hydraters/internal/types.ts";
-
-interface LearnedSpell extends BaseSpell {
-  taughtBy: number;
-}
+import {
+  SpellType,
+  type AnySpell,
+  type LearnedSpell,
+} from "../hydraters/internal/types.ts";
 
 interface SpellLearnSpell {
   SpellID: number;
@@ -13,7 +13,7 @@ interface SpellLearnSpell {
 
 export default async function learnedSpells(
   dbc: Dbc,
-  otherSpells: BaseSpell[],
+  otherSpells: AnySpell[],
 ): Promise<LearnedSpell[]> {
   const spellLearnSpell = await dbc.loadTable<SpellLearnSpell>(
     "SpellLearnSpell",
@@ -25,7 +25,7 @@ export default async function learnedSpells(
     const taughtSpells = spellLearnSpell.getAll(spell.id);
     return taughtSpells.map(({ LearnSpellID, OverridesSpellID }) => ({
       id: LearnSpellID,
-      type: spell.type,
+      type: SpellType.Learned,
       overrides: OverridesSpellID > 0 ? OverridesSpellID : undefined,
       taughtBy: spell.id,
     }));

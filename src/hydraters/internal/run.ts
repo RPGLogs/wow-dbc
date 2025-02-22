@@ -1,5 +1,5 @@
 import type { Dbc } from "../../dbc.ts";
-import type { BaseSpell, Hydrater, Input } from "./types.ts";
+import type { AnySpell, Hydrater, Input } from "./types.ts";
 
 const TIMERS = false;
 export type FinalOutput<T extends Record<string, Hydrater<any, any>>> =
@@ -8,7 +8,7 @@ export type FinalOutput<T extends Record<string, Hydrater<any, any>>> =
 export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
   hydraters: H,
   dbc: Dbc,
-  spellList: BaseSpell[],
+  spellList: AnySpell[],
 ): Promise<FinalOutput<H>[]> {
   const addedHydraters = new Set();
   const allHydraters = [];
@@ -26,7 +26,7 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
     }
   }
 
-  const spellmap: Map<number, BaseSpell> = new Map();
+  const spellmap: Map<number, AnySpell> = new Map();
   for (const spell of spellList) {
     if (spellmap.has(spell.id)) {
       console.warn(`Spell list contains duplicate spell id: ${spell.id}`);

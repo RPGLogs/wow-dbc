@@ -9,13 +9,14 @@ import {
   type FinalOutput,
   type Hydrater,
 } from "./src/hydraters/index.ts";
-import type { BaseSpell } from "./src/hydraters/internal/types.ts";
+import type { AnySpell } from "./src/hydraters/internal/types.ts";
 import name from "./src/hydraters/name.ts";
 import passive from "./src/hydraters/passive.ts";
 import classSpells from "./src/spell-lists/class-spells.ts";
 import dragonflightTalentSpells from "./src/spell-lists/df-talent-spells.ts";
 import learnedSpells from "./src/spell-lists/learned-spells.ts";
 import specSpells from "./src/spell-lists/spec-spells.ts";
+import temporarySpells from "./src/spell-lists/temporary-spells.ts";
 export { dbc } from "./src/dbc.ts";
 
 const retailSpellPreset = {
@@ -38,7 +39,7 @@ export const PRESETS = {
 export async function loadAll<H extends HydraterDefinition>(
   hydraterDef: H,
   dbc: Dbc,
-  spellList: BaseSpell[],
+  spellList: AnySpell[],
 ): Promise<FinalOutput<H>[]> {
   return doHydration(hydraterDef, dbc, spellList);
 }
@@ -75,7 +76,7 @@ const PLAYER_CLASS_FLAG = 0x2;
 export async function retailSpellList(
   dbc: Dbc,
   specId: number,
-): Promise<BaseSpell[]> {
+): Promise<AnySpell[]> {
   const classId = await getClassId(dbc, specId);
   if (!classId) {
     throw new Error(`unable to retrieve class for spec id ${specId}`);
@@ -88,6 +89,10 @@ export async function retailSpellList(
   ]);
 
   const spellList = spellLists.flat();
-
-  return spellList.concat(await learnedSpells(dbc, spellList));
+  const withLearnedSpells = spellList.concat(
+    await learnedSpells(dbc, spellList),
+  );
+  return withLearnedSpells.concat(
+    await temporarySpells(dbc, withLearnedSpells),
+  );
 }

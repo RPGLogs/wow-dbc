@@ -1,5 +1,5 @@
 import type { Dbc } from "../dbc.ts";
-import type { BaseSpell } from "../hydraters/internal/types.ts";
+import type { AnySpell } from "../hydraters/internal/types.ts";
 import { SpellType } from "../hydraters/internal/types.ts";
 
 interface SkillRaceClassInfo {
@@ -11,6 +11,11 @@ interface SkillRaceClassInfo {
 interface SkillLineAbility {
   SkillLine: number;
   Spell: number;
+}
+
+export function isRemovedSpell(dbc: Dbc, spellId: number): boolean {
+  const table = dbc.getTable("Spell", "ID");
+  return table.getFirst(spellId) === undefined;
 }
 
 // magic flag for class skill line
@@ -32,7 +37,7 @@ export async function classSkillLine(
 export default async function classSpells(
   dbc: Dbc,
   classId: number,
-): Promise<BaseSpell[]> {
+): Promise<AnySpell[]> {
   const skillLineId = await classSkillLine(dbc, classId);
   if (!skillLineId) {
     return [];
@@ -42,7 +47,9 @@ export default async function classSpells(
     "SkillLineAbility",
     "SkillLine",
   );
+  await dbc.loadTable("Spell", "ID");
   return skillLineAbilities
     .getAll(skillLineId)
-    .map(({ Spell }) => ({ id: Spell, type: SpellType.Class }));
+    .filter(({ Spell }) => !isRemovedSpell(dbc, Spell))
+    .map(({ Spell }) => ({ id: Spell, type: SpellType.Baseline }));
 }

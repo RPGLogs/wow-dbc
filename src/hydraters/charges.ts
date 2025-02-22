@@ -5,6 +5,7 @@ import effects, {
   type WithModifiers,
 } from "./effects.ts";
 import passive from "./passive.ts";
+import type { Cooldown } from "./cooldown.ts";
 
 interface Output {
   charges?: WithModifiers<MaxCharges>;
@@ -13,9 +14,6 @@ interface Output {
 
 interface MaxCharges {
   max: number;
-}
-interface Cooldown {
-  duration: number;
 }
 
 interface SpellCategory {
@@ -72,20 +70,26 @@ export default hydrater({
       },
     );
 
-    // TODO: hasted cooldown with charges
     const cooldown = effectWithModifiers<Cooldown>(
       spellList,
       input,
-      { duration: categoryDefinition.ChargeRecoveryTime },
+      { duration: categoryDefinition.ChargeRecoveryTime, hasted: false },
       (acc, effect) => {
-        if (effect.aura !== EffectType.CHARGE_RECOVERY_MULTIPLIER) {
-          return acc;
+        if (effect.aura === EffectType.CHARGE_RECOVERY_MULTIPLIER) {
+          return {
+            ...acc,
+            duration:
+              (acc?.duration ?? 0) +
+              categoryDefinition.ChargeRecoveryTime * (effect.basePoints / 100),
+          };
         }
-        return {
-          duration:
-            (acc?.duration ?? 0) +
-            categoryDefinition.ChargeRecoveryTime * (effect.basePoints / 100),
-        };
+        if (effect.aura === EffectType.CHARGE_RECOVERY_BY_HASTE) {
+          return {
+            ...acc,
+            hasted: true,
+          };
+        }
+        return acc;
       },
     );
 

@@ -1,5 +1,5 @@
 import type { Dbc } from "../dbc.ts";
-import { SpellType, type BaseSpell } from "../hydraters/internal/types.ts";
+import { SpellType, type AnySpell } from "../hydraters/internal/types.ts";
 
 interface SpecializationSpell {
   SpecID: number;
@@ -15,7 +15,7 @@ interface SpecializationSpell {
 export default async function specSpells(
   dbc: Dbc,
   specId: number,
-): Promise<BaseSpell[]> {
+): Promise<AnySpell[]> {
   const specializationSpells = await dbc.loadTable<SpecializationSpell>(
     "SpecializationSpells",
     "SpecID",
@@ -24,7 +24,7 @@ export default async function specSpells(
     .getAll(specId)
     .map(({ SpellID, OverridesSpellID }) => ({
       id: SpellID,
-      type: SpellType.Spec,
+      type: SpellType.Baseline,
       overrides: OverridesSpellID > 0 ? OverridesSpellID : undefined,
     }));
 }

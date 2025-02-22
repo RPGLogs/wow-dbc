@@ -1,24 +1,51 @@
 import type { Dbc } from "../../dbc.ts";
 
 export enum SpellType {
-  Class = "class",
-  Spec = "spec",
+  Baseline = "baseline",
   Talent = "talent",
-  Item = "item",
-  /**
-   * Used for triggered temporary buffs, including cooldown buffs that happen on cast and proc buffs.
-   */
-  TemporaryAura = "temporary-aura",
+  Learned = "learned",
+  // temporary spells, typically available during a cooldown
+  Temporary = "temporary",
 }
 
-export interface BaseSpell {
+interface SharedSpellProps {
   id: number;
-  type?: SpellType;
   /**
    * Indicates that this spell, when known, overrides another spell with this id.
    */
   overrides?: number;
 }
+
+export interface BaselineSpell extends SharedSpellProps {
+  type: SpellType.Baseline;
+}
+
+export interface LearnedSpell extends SharedSpellProps {
+  type: SpellType.Learned;
+  taughtBy: number;
+}
+
+export interface TalentSpell extends SharedSpellProps {
+  type: SpellType.Talent;
+  requiresTalentEntry: number[];
+  // TODO
+  visibleSpellId?: number;
+  /**
+   * Granted talents are generally not included in talent exports, including combat log data.
+   */
+  granted?: boolean;
+}
+
+export interface TemporarySpell extends SharedSpellProps {
+  type: SpellType.Temporary;
+  grantedBy: number;
+}
+
+export type AnySpell =
+  | BaselineSpell
+  | LearnedSpell
+  | TalentSpell
+  | TemporarySpell;
 
 /**
  * Build a hydrater. No magic here. Just triggers inference of the type parameters.
@@ -65,9 +92,15 @@ type Output<T> = T extends Hydrater<infer Out, any> ? Out : never;
 type InputRaw<T extends Record<string, Hydrater<any, any>>> = {
   [k in keyof T]: (x: Output<T[k]>) => void;
 }[keyof T] extends (x: infer I) => void
-  ? BaseSpell & I
+  ? I
   : never;
 
-export type Input<T extends Record<string, Hydrater<any, any>>> = {
+type InputFlat<Base, T extends Record<string, Hydrater<any, any>>> = Base & {
   [k in keyof InputRaw<T>]: InputRaw<T>[k];
 };
+
+export type Input<T extends Record<string, Hydrater<any, any>>> =
+  | InputFlat<BaselineSpell, T>
+  | InputFlat<TalentSpell, T>
+  | InputFlat<LearnedSpell, T>
+  | InputFlat<TemporarySpell, T>;

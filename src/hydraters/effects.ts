@@ -1,5 +1,5 @@
 import type { Table } from "../dbc.ts";
-import { hydrater, SpellType, type BaseSpell } from "./internal/types.ts";
+import { hydrater, SpellType, type AnySpell } from "./internal/types.ts";
 import type { SpellCategories } from "./charges.ts";
 import classMask, { matchesClassMask } from "./classMask.ts";
 import label from "./label.ts";
@@ -118,10 +118,12 @@ export enum EffectType {
   PERIODIC_TRIGGER_SPELL = 23,
   ADD_FLAT_MODIFIER = 107,
   ADD_FLAT_MODIFIER_BY_SPELL_LABEL = 219,
+  OVERRIDE_ACTIONBAR_SPELLS = 332,
   MOD_MAX_CHARGES = 411,
   MOD_COOLDOWN_BY_HASTE = 416,
   MOD_GCD_BY_HASTE = 417,
   CHARGE_RECOVERY_MULTIPLIER = 454,
+  CHARGE_RECOVERY_BY_HASTE = 457,
 }
 
 export enum EffectMiscValue {
@@ -135,10 +137,10 @@ export enum EffectMiscValue {
 }
 
 function pointModifiers(
-  spell: BaseSpell & { label?: number[] },
+  spell: AnySpell & { label?: number[] },
   effect: SpellEffectRaw,
   spellEffect: Table<SpellEffectRaw, "SpellID">,
-  spellList: Map<number, BaseSpell>,
+  spellList: Map<number, AnySpell>,
 ): Record<number, number> {
   if (!spell.label) {
     return [];
@@ -176,6 +178,7 @@ const effectIndexLookup: Record<number, number> = {
 const effectCategoryTypes: Record<number, keyof SpellCategories> = {
   [EffectType.MOD_MAX_CHARGES]: "ChargeCategory",
   [EffectType.CHARGE_RECOVERY_MULTIPLIER]: "ChargeCategory",
+  [EffectType.CHARGE_RECOVERY_BY_HASTE]: "ChargeCategory",
 };
 
 export type Modifier<T> = Partial<T> & {
@@ -187,16 +190,16 @@ export type WithModifiers<T> = T & {
 };
 
 function isBaselineSpell(
-  spellList: Map<number, BaseSpell>,
+  spellList: Map<number, AnySpell>,
   spellId: number,
 ): boolean {
   const spell = spellList.get(spellId);
-  return spell?.type === SpellType.Class || spell?.type === SpellType.Spec;
+  return spell?.type === SpellType.Baseline;
 }
 
 export function effectWithModifiers<T>(
-  spellList: Map<number, BaseSpell>,
-  spell: BaseSpell & Output,
+  spellList: Map<number, AnySpell>,
+  spell: AnySpell & Output,
   baselineValue: T,
   accumulateEffectValue: (
     acc: T | undefined,
