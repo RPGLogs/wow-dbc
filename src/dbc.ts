@@ -66,6 +66,9 @@ async function getTableData(
   return body;
 }
 
+/**
+ * A reference to a DBC table in memory, indexed by `K`.
+ */
 export class Table<T extends Record<string, any>, K extends keyof T> {
   private readonly data: Map<T[K], T[]>;
   public readonly key: K;
@@ -75,14 +78,23 @@ export class Table<T extends Record<string, any>, K extends keyof T> {
     this.data = keyByMultiple(data, key);
   }
 
+  /**
+   * Get the first row with `K = index`, if any exist.
+   */
   getFirst(index: T[K]): T | undefined {
     return this.data.get(index)?.[0];
   }
 
+  /**
+   * Get all rows where `K = index`.
+   */
   getAll(index: T[K]): T[] {
     return this.data.get(index) ?? [];
   }
 
+  /**
+   * Get **all** rows. This should be a last resort!
+   */
   contents(): T[] {
     return Array.from(this.data.values()).flat();
   }
@@ -98,6 +110,9 @@ async function getTable<T extends Record<string, any>>(
   return parser.typedObjs(rawCsv);
 }
 
+/**
+ * Generate a `Dbc` object with build version `buildVersion`.
+ */
 export function dbc(buildVersion: string): Dbc {
   const cache: Record<string, Table<any, any>> = {};
   return {
@@ -121,24 +136,7 @@ export function dbc(buildVersion: string): Dbc {
   };
 }
 
-/**
- * Convenience helper for looking up values.
- */
-export function keyBy<T, K extends keyof T>(
-  records: T[],
-  key: K,
-): Map<T[K], T> {
-  const result = new Map();
-  for (const record of records) {
-    result.set(record[key], record);
-  }
-  return result;
-}
-
-/**
- * Same as `keyBy`, except that duplicate keys are handled. Slightly more annoying to work with otherwise.
- */
-export function keyByMultiple<T, K extends keyof T>(
+function keyByMultiple<T, K extends keyof T>(
   records: T[],
   key: K,
 ): Map<T[K], T[]> {

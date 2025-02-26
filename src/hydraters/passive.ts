@@ -27,7 +27,6 @@ export default hydrater({
     },
   ],
   hydrate(dbc, input): Output {
-    // spellmisc is really big so we are putting extra effort into not re-keying it.
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
 
     if (!spellMisc.getFirst(input.id)) {

@@ -9,6 +9,9 @@ interface SpellLabel {
   LabelID: number;
 }
 
+/**
+ * Retrieve the *labels* of a spell. Spell labels are machine-readable numeric identifiers, *not* human-readable category strings.
+ */
 export default hydrater({
   name: "label",
   tables: [{ name: "SpellLabel", key: "SpellID" }],

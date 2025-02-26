@@ -5,6 +5,10 @@ const TIMERS = false;
 export type FinalOutput<T extends Record<string, Hydrater<any, any>>> =
   Input<T>;
 
+/**
+ * Apply a collection of `Hydrater`s to a list of spells, producing a list of spell objects.
+ * The output is not guaranteed to be the same order as the input.
+ */
 export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
   hydraters: H,
   dbc: Dbc,
@@ -32,20 +36,6 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
       console.warn(`Spell list contains duplicate spell id: ${spell.id}`);
     }
     spellmap.set(spell.id, spell);
-  }
-
-  for (const hydrater of allHydraters) {
-    if (
-      !satisfiesBuildVersion(
-        dbc.buildVersion,
-        hydrater.afterBuildVersion,
-        hydrater.beforeBuildVersion,
-      )
-    ) {
-      throw new Error(
-        `cannot perform spell hydration ${hydrater.name}: ${dbc.buildVersion} does not satisfy constraints ${hydrater.afterBuildVersion ? ">" + hydrater.afterBuildVersion : ""} ${hydrater.beforeBuildVersion ? "<" + hydrater.beforeBuildVersion : ""}`,
-      );
-    }
   }
 
   TIMERS && console.time("table load");
@@ -77,19 +67,12 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
   return spellList as FinalOutput<H>[];
 }
 
-function satisfiesBuildVersion(
-  buildVersion: string,
-  afterVersion: string | undefined,
-  beforeVersion: string | undefined,
-): boolean {
-  // TODO
-  return true;
-}
-
-function parseVersion(version: string): number[] {
-  return version.split(".").map(Number);
-}
-
+/**
+ * Topologically sort the hydraters such that processing them from first to last
+ * causes all dependents of hydrater `H` to be run *after* `H` is run.
+ *
+ * @throws {Error} if the hydraters contain a dependency cycle.
+ */
 function topoSortHydraters(
   hydraters: Array<Hydrater<any, any>>,
 ): Array<Hydrater<any, any>> {

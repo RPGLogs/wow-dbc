@@ -16,15 +16,26 @@ interface SharedSpellProps {
   overrides?: number;
 }
 
+/**
+ * A spell that is always available to the player at max level as a result of their
+ * selected class/spec.
+ */
 export interface BaselineSpell extends SharedSpellProps {
   type: SpellType.Baseline;
 }
 
+/**
+ * A spell that is taught by another spell. The availability of the learned spell is the
+ * availability of the spell it is `taughtBy`.
+ */
 export interface LearnedSpell extends SharedSpellProps {
   type: SpellType.Learned;
   taughtBy: number;
 }
 
+/**
+ * A spell that comes from a Dragonflight talent tree.
+ */
 export interface TalentSpell extends SharedSpellProps {
   type: SpellType.Talent;
   requiresTalentEntry: number[];
@@ -36,6 +47,9 @@ export interface TalentSpell extends SharedSpellProps {
   granted?: boolean;
 }
 
+/**
+ * A spell that is temporarily available, such as a temporary override due to a buff.
+ */
 export interface TemporarySpell extends SharedSpellProps {
   type: SpellType.Temporary;
   grantedBy: number;
@@ -48,7 +62,8 @@ export type AnySpell =
   | TemporarySpell;
 
 /**
- * Build a hydrater. No magic here. Just triggers inference of the type parameters.
+ * Build a hydrater. This method triggers type inferrence in a way that *mostly* doesn't require
+ * manual type annotations.
  */
 export function hydrater<
   Output extends Record<string, any>,
@@ -58,28 +73,38 @@ export function hydrater<
 }
 
 /**
- * Core type for hydrating fields on a spell object. Dependencies are guaranteed to be hydrated beforehand.
+ * A *hydrater* defines how to produce (hydrate) a set of `Output` fields from spell data.
+ * Hydraters may have dependencies on other Hydraters, which will be run first to populate
+ * *their* `Output`s. This allows the hydration of complex output types to be split out into
+ * (mostly) independent objects.
  */
 export interface Hydrater<
   Output extends Record<string, any>,
   Deps extends Record<string, Hydrater<unknown, any>>,
 > {
   name: string;
+  /**
+   * Dependencies for the hydrater. Dependencies will be run first. Circular dependencies will
+   * cause a hydration error in `doHydration`.
+   *
+   * *Note:* dependencies are supplied as an *object* rather than a *list* in order to work
+   * around some limitations of TypeScript's inference. Using a list would result in an opaque type
+   * when composing hydraters.
+   */
   dependencies?: Deps;
+  /**
+   * A list of tables to pre-load and index before calling `hydrate`. This is a performance optimization,
+   * and allows `hydrate` to be non-async (which matters an annoying amount when processing thousands of entries).
+   */
   tables: TableRef[];
+  /**
+   * Perform the hydration of `Output`. Note that you *do not* need to merge this with `input`, just output the *new fields*.
+   */
   hydrate(
     dbc: Dbc,
     input: Input<Deps>,
     spellList: Map<number, Input<Deps>>,
   ): Output;
-  /**
-   * The minimum build version that this hydrater can run on. For example: Dragonflight talent hydraters require build version 10.0.0 or greater.
-   */
-  afterBuildVersion?: string;
-  /**
-   * The first build version that this hydrater can *no longer* run on. For example: Classic talent hydraters cannot run on MoP data, so 5.0.0.
-   */
-  beforeBuildVersion?: string;
 }
 
 interface TableRef {
@@ -95,10 +120,17 @@ type InputRaw<T extends Record<string, Hydrater<any, any>>> = {
   ? I
   : never;
 
+/**
+ * Inner type that "flattens" a composed type. This is helpful for type tooltips,
+ * especially if you narrow the result to a single spell type.
+ */
 type InputFlat<Base, T extends Record<string, Hydrater<any, any>>> = Base & {
   [k in keyof InputRaw<T>]: InputRaw<T>[k];
 };
 
+/**
+ * The input of a `Hydrater`, defined by its `Deps` (aka `T`).
+ */
 export type Input<T extends Record<string, Hydrater<any, any>>> =
   | InputFlat<BaselineSpell, T>
   | InputFlat<TalentSpell, T>

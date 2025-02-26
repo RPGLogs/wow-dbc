@@ -34,6 +34,13 @@ interface SpellMisc {
   Attributes_0: number;
 }
 
+/**
+ * Retrieve the global cooldown information for a spell. The default global cooldown is applied via category 133. Virtually all spells have this category, or category 0 (indicating an off-gcd spell).
+ *
+ * Haste is not applied by default to most spells that use weapons. However, effects may cause those spells to have hasted GCDs. Conventionally, there is a "spec aura" that applies an effect to haste all GCDs for melee/phys ranged specs with hasted GCDs, such as Death Knights or Warriors.
+ *
+ * Haste *is* applied by default to spells that do not use weapons, unless they have the "Is Ability" flag in `SpellMisc`, which seems to mostly be used for unarmed "attacks" like Feral/Guardian Druid spells. Effects may override this exception.
+ */
 export default hydrater({
   name: "gcd",
   tables: [

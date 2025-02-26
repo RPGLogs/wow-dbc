@@ -36,6 +36,20 @@ interface SpellEffectRaw {
   EffectTriggerSpell: number;
 }
 
+/**
+ * Populate the effects that are applied to a spell by other spells.
+ *
+ * There are multiple ways for a spell to indicate that its effects modify another spell. The three most common are:
+ * - By class mask. See `classMask` and `matchesClassMask` for details.
+ * - By label. See `label` for details.
+ * - By category. "Category" generally means a charge, cooldown, or GCD category. An effect may modify the entire category.
+ *
+ * Effects may additionally be modified by other effects. This hydrater goes 1 layer deep to capture those second-order effects. There is no guarantee that this captures everything.
+ *
+ * This will include all effects found by the above lookup methods. It does not attempt to interpret the effects.
+ *
+ * See `gcd` for example usage.
+ */
 export default hydrater({
   name: "effects",
   dependencies: { classMask, label },
@@ -182,6 +196,7 @@ const effectCategoryTypes: Record<number, keyof SpellCategories> = {
 };
 
 export type Modifier<T> = Partial<T> & {
+  /** The list of spells which must ALL be known to enable this modifier. */
   requiredSpells: number[];
 };
 
@@ -197,6 +212,39 @@ function isBaselineSpell(
   return spell?.type === SpellType.Baseline;
 }
 
+/**
+ * Process the effects applied to a spell, producing an object that has:
+ *
+ * - Top-level: the properties from `T`, modified by any baseline spells.
+ * - Modifiers: a list of modifiers, listing required spells for the modifier to take effect as well as the properties to be merged into the top-level object.
+ *
+ * ## Example
+ *
+ * To generate GCD information, the `gcd` hydrater depends on the `effects` hydrater, then calls `effectWithModifiers`:
+ *
+ * ```ts
+ * const result = effectWithModifiers(spellList, input, { duration: baseDuration, hasted: defaultHasted }, accumulator);
+ * ```
+ *
+ * `result` would look something like:
+ *
+ * ```ts
+ * {
+ *   duration: 1500,
+ *   hasted: true,
+ *   modifiers: [
+ *     {
+ *       requiredSpells: [1234, 5678],
+ *       duration: -500,
+ *     }
+ *   ]
+ * }
+ * ```
+ *
+ * This indicates that the spell gcd with the baseline spells in `spellList` is 1.5s (hasted), and that the GCD
+ * is reduced by 0.5s if spells `1234` and `5678` are *both* known.
+ *
+ */
 export function effectWithModifiers<T>(
   spellList: Map<number, AnySpell>,
   spell: AnySpell & Output,

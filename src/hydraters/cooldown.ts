@@ -25,6 +25,9 @@ interface SpellCooldown {
   StartRecoveryTime: number;
 }
 
+/**
+ * Retrieve the cooldown for a spell, along with modifiers. This depends on `charges` to avoid conflicts. Cooldowns from charge categories take priority over cooldowns from `SpellCooldowns`.
+ */
 export default hydrater({
   name: "cooldown",
   tables: [{ name: "SpellCooldowns", key: "SpellID" }],

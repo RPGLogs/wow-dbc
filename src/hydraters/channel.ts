@@ -28,6 +28,13 @@ interface SpellDuration {
   Duration: number;
 }
 
+/**
+ * Retrieve data about the channeling that a spell causes. Broadly, there are 3 types of channeled spells:
+ *
+ * - Periodic Triggers: Channeling the spell causes another spell to periodically fire (via a `SpellEffect` entry).
+ * - Auras: Channeling the spell applies a visible aura to the player for the duration of the channel.
+ * - Special: the hopeless ones. Spells like Penance that *look like* simple periodic triggers from in-game usage are secretly special because their spell effects are just "Server-Side Effect".
+ */
 export default hydrater({
   name: "channel",
   dependencies: { effects },
@@ -42,7 +49,7 @@ export default hydrater({
       return {};
     }
 
-    const isChannel = Boolean(misc.Attributes_1 & 0x4);
+    const isChannel = Boolean(misc.Attributes_1 & CHANNELED_SPELL_MASK);
     if (!isChannel) {
       return {};
     }
@@ -54,9 +61,11 @@ export default hydrater({
     }
 
     // there are two separate flags. one for the periodic trigger being hasted, and one for the duration being hasted.
-    const hasted = Boolean(misc.Attributes_8 & 0x20000);
+    const hasted = Boolean(misc.Attributes_8 & DURATION_HASTED_MASK);
 
-    const periodicHasted = Boolean(misc.Attributes_5 & 0x2000);
+    const periodicHasted = Boolean(
+      misc.Attributes_5 & PERIODIC_TRIGGER_HASTED_MASK,
+    );
     const triggeredSpells = input.effects
       .filter(
         (effect) =>
@@ -69,7 +78,7 @@ export default hydrater({
         hasted: periodicHasted,
       }));
 
-    const buffIsLogged = !Boolean(misc.Attributes_6 & 0x400);
+    const buffIsLogged = !Boolean(misc.Attributes_6 & BUFF_IS_LOGGED_MASK);
 
     // TODO: there are probably effects that adjust the duration or modify the trigger period
 
@@ -83,3 +92,8 @@ export default hydrater({
     };
   },
 });
+
+const CHANNELED_SPELL_MASK = 0x4;
+const DURATION_HASTED_MASK = 0x20000;
+const PERIODIC_TRIGGER_HASTED_MASK = 0x2000;
+const BUFF_IS_LOGGED_MASK = 0x400;

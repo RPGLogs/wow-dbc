@@ -27,6 +27,12 @@ export interface SpellCategories {
   ChargeCategory: number;
 }
 
+/**
+ * Load the charges for a spell. A spell with charges **does not** have a normal cooldown, but *may* have a GCD.
+ *
+ * Charges are implemented via "categories". A spell may have a `ChargeCategory` which defines the number of charges and the default charge cooldown. Other spells
+ * may share this category, in which case the spells *share charges.*
+ */
 export default hydrater({
   name: "charges",
   tables: [
