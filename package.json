@@ -6,7 +6,6 @@
   "main": "index.ts",
   "keywords": [],
   "author": "",
-  "license": "BSD-3-Clause",
   "devDependencies": {
     "@types/node": "^22.13.2",
     "typescript": "^5.7.3"
