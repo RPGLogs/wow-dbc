@@ -3,6 +3,7 @@ import castTime from "./src/hydraters/castTime.ts";
 import channel from "./src/hydraters/channel.ts";
 import charges from "./src/hydraters/charges.ts";
 import cooldown from "./src/hydraters/cooldown.ts";
+import castableWhileCasting from "./src/hydraters/castableWhileCasting.ts";
 import gcd from "./src/hydraters/gcd.ts";
 import {
   doHydration,
@@ -27,6 +28,7 @@ const retailSpellPreset = {
   gcd,
   name,
   passive,
+  castableWhileCasting,
 };
 
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
