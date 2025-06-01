@@ -1,5 +1,5 @@
 import { hydrater } from "./internal/types.ts";
-import effects, { EffectType } from "./effects.ts";
+import { EffectType } from "./effects.ts";
 
 interface Output {
   channel?: {
@@ -28,6 +28,13 @@ interface SpellDuration {
   Duration: number;
 }
 
+interface SpellEffectRaw {
+  SpellID: number;
+  EffectAura: number;
+  EffectTriggerSpell: number;
+  EffectAuraPeriod: number;
+}
+
 /**
  * Retrieve data about the channeling that a spell causes. Broadly, there are 3 types of channeled spells:
  *
@@ -37,10 +44,10 @@ interface SpellDuration {
  */
 export default hydrater({
   name: "channel",
-  dependencies: { effects },
   tables: [
     { name: "SpellMisc", key: "SpellID" },
     { name: "SpellDuration", key: "ID" },
+    { name: "SpellEffect", key: "SpellID" },
   ],
   hydrate(dbc, input): Output {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
@@ -68,15 +75,20 @@ export default hydrater({
     const periodicHasted = Boolean(
       misc.Attributes_5 & PERIODIC_TRIGGER_HASTED_MASK,
     );
-    const triggeredSpells = input.effects
+    const spellEffect = dbc.getTable<SpellEffectRaw, "SpellID">(
+      "SpellEffect",
+      "SpellID",
+    );
+    const triggeredSpells = spellEffect
+      .getAll(input.id)
       .filter(
         (effect) =>
-          effect.aura === EffectType.PERIODIC_TRIGGER_SPELL &&
-          effect.triggeredSpell,
+          effect.EffectAura === EffectType.PERIODIC_TRIGGER_SPELL &&
+          effect.EffectTriggerSpell,
       )
       .map((effect) => ({
-        spell: effect.triggeredSpell,
-        period: effect.period,
+        spell: effect.EffectTriggerSpell,
+        period: effect.EffectAuraPeriod,
         hasted: periodicHasted,
       }));
 
