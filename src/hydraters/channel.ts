@@ -49,7 +49,9 @@ export default hydrater({
       return {};
     }
 
-    const isChannel = Boolean(misc.Attributes_1 & CHANNELED_SPELL_MASK);
+    const isChannel =
+      Boolean(misc.Attributes_1 & CHANNELED_SPELL_MASK) ||
+      Boolean(misc.Attributes_1 & CHANNELED_SELF_SPELL_MASK);
     if (!isChannel) {
       return {};
     }
@@ -94,6 +96,7 @@ export default hydrater({
 });
 
 const CHANNELED_SPELL_MASK = 0x4;
+const CHANNELED_SELF_SPELL_MASK = 0x40;
 const DURATION_HASTED_MASK = 0x20000;
 const PERIODIC_TRIGGER_HASTED_MASK = 0x2000;
 const BUFF_IS_LOGGED_MASK = 0x400;
