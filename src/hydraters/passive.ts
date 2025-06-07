@@ -18,6 +18,12 @@ interface SpellMisc {
   Attributes_8: number;
 }
 
+interface SpellShapeshift {
+  SpellID: number;
+  ShapeshiftMask_0: number;
+  ShapeshiftMask_1: number;
+}
+
 export default hydrater({
   name: "passive",
   tables: [
@@ -25,6 +31,7 @@ export default hydrater({
       name: "SpellMisc",
       key: "SpellID",
     },
+    { name: "SpellShapeshift", key: "SpellID" },
   ],
   hydrate(dbc, input): Output {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
@@ -51,8 +58,23 @@ export default hydrater({
       hidden = "always";
     }
 
+    let passive = Boolean(Attributes_0 & PASSIVE_FLAG);
+
+    if (passive) {
+      const shapeshift = dbc.getTable<SpellShapeshift>(
+        "SpellShapeshift",
+        "SpellID",
+      );
+      const row = shapeshift.getFirst(input.id);
+
+      if (row?.ShapeshiftMask_0 || row?.ShapeshiftMask_1) {
+        // this is a passive applied while within a shapeshift form. we're not fully processing shapeshifts now, but this prevents e.g. regrowth gcd modifier from cat form from applying globally
+        passive = false;
+      }
+    }
+
     return {
-      passive: Boolean(Attributes_0 & PASSIVE_FLAG),
+      passive,
       hidden,
     };
   },
