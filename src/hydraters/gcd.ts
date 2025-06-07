@@ -90,7 +90,7 @@ export default hydrater({
       input,
       { duration: baseGcd, hasted: defaultHasted },
       (acc, effect) => {
-        const duration = effectGcdReduction(effect, acc.duration);
+        const duration = effectGcdReduction(effect, acc?.duration ?? baseGcd);
         const hasted = hastesGcd(effect);
 
         if (!hasted && !duration) {
