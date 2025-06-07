@@ -127,7 +127,7 @@ function effectGcdReduction(effect: SpellEffect, baseDuration: number): number {
     effect.aura === EffectType.ADD_PCT_MODIFIER &&
     effect.misc0 === EffectMiscValue.StartCooldown
   ) {
-    return (effect.basePoints / 100) * baseDuration;
+    return -(effect.basePoints / 100) * baseDuration;
   }
 
   return 0;
