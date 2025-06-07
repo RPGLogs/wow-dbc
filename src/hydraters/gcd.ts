@@ -90,7 +90,7 @@ export default hydrater({
       input,
       { duration: baseGcd, hasted: defaultHasted },
       (acc, effect) => {
-        const duration = effectGcdReduction(effect);
+        const duration = effectGcdReduction(effect, acc.duration);
         const hasted = hastesGcd(effect);
 
         if (!hasted && !duration) {
@@ -113,13 +113,21 @@ export default hydrater({
 const BASE_GCD = 1500;
 const GCD_CATEGORY = 133;
 
-function effectGcdReduction(effect: SpellEffect): number {
+function effectGcdReduction(effect: SpellEffect, baseDuration: number): number {
   if (
     effect.aura === EffectType.ADD_FLAT_MODIFIER &&
     effect.misc0 === EffectMiscValue.StartCooldown
   ) {
     // flat GCD reduction. yay magic constants
     return -effect.basePoints;
+  }
+
+  // TODO: not sure when  percentages are resolved. for now, this is simplest
+  if (
+    effect.aura === EffectType.ADD_PCT_MODIFIER &&
+    effect.misc0 === EffectMiscValue.StartCooldown
+  ) {
+    return (effect.basePoints / 100) * baseDuration;
   }
 
   return 0;
