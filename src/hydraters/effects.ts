@@ -204,12 +204,16 @@ export type WithModifiers<T> = T & {
   modifiers?: Modifier<T>[];
 };
 
-function isBaselineSpell(
+function isBaselinePassiveSpell(
   spellList: Map<number, AnySpell>,
   spellId: number,
 ): boolean {
   const spell = spellList.get(spellId);
-  return spell?.type === SpellType.Baseline;
+  return (
+    spell?.type === SpellType.Baseline &&
+    "passive" in spell &&
+    Boolean(spell?.passive)
+  );
 }
 
 /**
@@ -275,7 +279,7 @@ export function effectWithModifiers<T>(
   });
   const baselineEffects = effectsWithModifiers
     .filter(({ requires }) =>
-      requires.every((id) => isBaselineSpell(spellList, id)),
+      requires.every((id) => isBaselinePassiveSpell(spellList, id)),
     )
     .map(({ effect }) => effect);
 
@@ -284,7 +288,7 @@ export function effectWithModifiers<T>(
   const modifierEffectsBySource: Map<string, SpellEffect[]> =
     effectsWithModifiers
       .filter(({ requires }) =>
-        requires.some((id) => !isBaselineSpell(spellList, id)),
+        requires.some((id) => !isBaselinePassiveSpell(spellList, id)),
       )
       .reduce((map, { requires, effect }) => {
         const key = requires.join(",");
