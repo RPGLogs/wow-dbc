@@ -37,6 +37,7 @@ export declare const EffectType: {
     ADD_PCT_MODIFIER: number;
     ADD_FLAT_MODIFIER_BY_SPELL_LABEL: number;
     OVERRIDE_ACTIONBAR_SPELLS: number;
+    OVERRIDE_ACTIONBAR_SPELLS_TRIGGERED: number;
     MOD_MAX_CHARGES: number;
     MOD_COOLDOWN_BY_HASTE: number;
     MOD_GCD_BY_HASTE: number;

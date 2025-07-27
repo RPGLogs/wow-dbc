@@ -26,7 +26,9 @@ export default async function temporarySpells(
 
     return effects
       .filter(
-        (effect) => effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS,
+        (effect) =>
+          effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS ||
+          effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS_TRIGGERED,
       )
       .map(
         (effect) =>

@@ -5,7 +5,8 @@ export default async function temporarySpells(dbc, otherSpells) {
     return otherSpells.flatMap((spell) => {
         const effects = spellEffect.getAll(spell.id);
         return effects
-            .filter((effect) => effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS)
+            .filter((effect) => effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS ||
+            effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS_TRIGGERED)
             .map((effect) => ({
             id: effect.EffectBasePointsF,
             grantedBy: spell.id,
