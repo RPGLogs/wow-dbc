@@ -1,6 +1,7 @@
 export const SpellType = {
     Baseline: "baseline",
     Talent: "talent",
+    MistsTalent: "mists-talent",
     Learned: "learned",
     // temporary spells, typically available during a cooldown
     Temporary: "temporary",

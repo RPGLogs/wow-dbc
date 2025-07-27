@@ -12,6 +12,7 @@ import dragonflightTalentSpells from "./src/spell-lists/df-talent-spells.js";
 import learnedSpells from "./src/spell-lists/learned-spells.js";
 import specSpells from "./src/spell-lists/spec-spells.js";
 import temporarySpells from "./src/spell-lists/temporary-spells.js";
+import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.js";
 export { dbc } from "./src/dbc.js";
 const retailSpellPreset = {
     castTime,
@@ -61,4 +62,33 @@ export async function retailSpellList(dbc, specId) {
     const spellList = spellLists.flat();
     const withLearnedSpells = spellList.concat(await learnedSpells(dbc, spellList));
     return withLearnedSpells.concat(await temporarySpells(dbc, withLearnedSpells));
+}
+export async function classicSpellList(dbc, specId) {
+    const classId = await getClassId(dbc, specId);
+    if (!classId) {
+        throw new Error(`unable to retrieve class for spec id ${specId}`);
+    }
+    const spellLists = await Promise.all([
+        classSpells(dbc, classId),
+        specSpells(dbc, specId),
+        mistsTalentSpells(dbc, classId, specId),
+    ]);
+    const spellList = spellLists.flat();
+    const withLearnedSpells = spellList.concat(await learnedSpells(dbc, spellList));
+    return withLearnedSpells.concat(await temporarySpells(dbc, withLearnedSpells));
+}
+export async function getSpecIdByName(dbc, className, specName) {
+    const chrClasses = await dbc.loadTable("ChrClasses", "Filename");
+    const cls = chrClasses.getFirst(className.toUpperCase());
+    if (!cls) {
+        return undefined;
+    }
+    const chrSpec = await dbc.loadTable("ChrSpecialization", "ID");
+    for (const spec of chrSpec.contents()) {
+        if (spec.ClassID === cls.ID &&
+            spec.Name_lang.toUpperCase() === specName.toUpperCase()) {
+            return spec.ID;
+        }
+    }
+    return undefined;
 }

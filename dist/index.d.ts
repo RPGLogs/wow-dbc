@@ -79,4 +79,6 @@ export declare const PRESETS: {
 export declare function loadAll<H extends HydraterDefinition>(hydraterDef: H, dbc: Dbc, spellList: AnySpell[]): Promise<FinalOutput<H>[]>;
 export declare function retailSpecList(dbc: Dbc): Promise<number[]>;
 export declare function retailSpellList(dbc: Dbc, specId: number): Promise<AnySpell[]>;
+export declare function classicSpellList(dbc: Dbc, specId: number): Promise<AnySpell[]>;
+export declare function getSpecIdByName(dbc: Dbc, className: string, specName: string): Promise<number | undefined>;
 //# sourceMappingURL=index.d.ts.map

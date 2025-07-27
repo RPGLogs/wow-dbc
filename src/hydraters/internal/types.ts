@@ -3,6 +3,7 @@ import type { Dbc } from "../../dbc.ts";
 export const SpellType = {
   Baseline: "baseline" as const,
   Talent: "talent" as const,
+  MistsTalent: "mists-talent" as const,
   Learned: "learned" as const,
   // temporary spells, typically available during a cooldown
   Temporary: "temporary" as const,
@@ -49,6 +50,12 @@ export interface TalentSpell extends SharedSpellProps {
   granted?: boolean;
 }
 
+export interface MistsTalentSpell extends SharedSpellProps {
+  type: "mists-talent";
+  row: number;
+  column: number;
+}
+
 /**
  * A spell that is temporarily available, such as a temporary override due to a buff.
  */
@@ -61,7 +68,8 @@ export type AnySpell =
   | BaselineSpell
   | LearnedSpell
   | TalentSpell
-  | TemporarySpell;
+  | TemporarySpell
+  | MistsTalentSpell;
 
 /**
  * Build a hydrater. This method triggers type inferrence in a way that *mostly* doesn't require
@@ -137,4 +145,5 @@ export type Input<T extends Record<string, Hydrater<any, any>>> =
   | InputFlat<BaselineSpell, T>
   | InputFlat<TalentSpell, T>
   | InputFlat<LearnedSpell, T>
-  | InputFlat<TemporarySpell, T>;
+  | InputFlat<TemporarySpell, T>
+  | InputFlat<MistsTalentSpell, T>;

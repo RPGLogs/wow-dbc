@@ -1,0 +1,1 @@
+{"version":3,"file":"mists-talent-spells.d.ts","sourceRoot":"","sources":["../../../src/spell-lists/mists-talent-spells.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,GAAG,EAAE,MAAM,WAAW,CAAC;AACrC,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,gCAAgC,CAAC;AAYvE,wBAA8B,iBAAiB,CAC7C,GAAG,EAAE,GAAG,EACR,OAAO,EAAE,MAAM,EACf,MAAM,EAAE,MAAM,GACb,OAAO,CAAC,gBAAgB,EAAE,CAAC,CAe7B"}

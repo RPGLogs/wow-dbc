@@ -2,6 +2,7 @@ import type { Dbc } from "../../dbc.ts";
 export declare const SpellType: {
     Baseline: "baseline";
     Talent: "talent";
+    MistsTalent: "mists-talent";
     Learned: "learned";
     Temporary: "temporary";
 };
@@ -40,6 +41,11 @@ export interface TalentSpell extends SharedSpellProps {
      */
     granted?: boolean;
 }
+export interface MistsTalentSpell extends SharedSpellProps {
+    type: "mists-talent";
+    row: number;
+    column: number;
+}
 /**
  * A spell that is temporarily available, such as a temporary override due to a buff.
  */
@@ -47,7 +53,7 @@ export interface TemporarySpell extends SharedSpellProps {
     type: "temporary";
     grantedBy: number;
 }
-export type AnySpell = BaselineSpell | LearnedSpell | TalentSpell | TemporarySpell;
+export type AnySpell = BaselineSpell | LearnedSpell | TalentSpell | TemporarySpell | MistsTalentSpell;
 /**
  * Build a hydrater. This method triggers type inferrence in a way that *mostly* doesn't require
  * manual type annotations.
@@ -98,6 +104,6 @@ type InputFlat<Base, T extends Record<string, Hydrater<any, any>>> = Base & {
 /**
  * The input of a `Hydrater`, defined by its `Deps` (aka `T`).
  */
-export type Input<T extends Record<string, Hydrater<any, any>>> = InputFlat<BaselineSpell, T> | InputFlat<TalentSpell, T> | InputFlat<LearnedSpell, T> | InputFlat<TemporarySpell, T>;
+export type Input<T extends Record<string, Hydrater<any, any>>> = InputFlat<BaselineSpell, T> | InputFlat<TalentSpell, T> | InputFlat<LearnedSpell, T> | InputFlat<TemporarySpell, T> | InputFlat<MistsTalentSpell, T>;
 export {};
 //# sourceMappingURL=types.d.ts.map
