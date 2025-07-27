@@ -1,6 +1,6 @@
 {
-  "name": "@archon/wow-dbc",
-  "version": "1.0.0",
+  "name": "wow-dbc",
+  "version": "0.1.0",
   "type": "module",
   "description": "",
   "main": "index.ts",
