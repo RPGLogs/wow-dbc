@@ -33,7 +33,7 @@ export async function classSkillLine(
   );
   return skillRaceClassInfo
     .contents()
-    .filter(({ Flags }) => (Flags & CLASS_SKILL_FLAGS) > 0)
+    .filter(({ Flags }) => (Flags & CLASS_SKILL_FLAGS) === CLASS_SKILL_FLAGS)
     .find(({ ClassMask }) => ClassMask === 2 ** (classId - 1))?.SkillID;
 }
 
