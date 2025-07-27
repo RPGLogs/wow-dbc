@@ -11,7 +11,7 @@ export async function classSkillLine(dbc, classId) {
     const skillRaceClassInfo = await dbc.loadTable("SkillRaceClassInfo", "Flags");
     return skillRaceClassInfo
         .contents()
-        .filter(({ Flags }) => (Flags & CLASS_SKILL_FLAGS) > 0)
+        .filter(({ Flags }) => (Flags & CLASS_SKILL_FLAGS) === CLASS_SKILL_FLAGS)
         .find(({ ClassMask }) => ClassMask === 2 ** (classId - 1))?.SkillID;
 }
 export default async function classSpells(dbc, classId) {
