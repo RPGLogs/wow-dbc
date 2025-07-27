@@ -9,6 +9,8 @@ import {
 interface SpellEffectGrant {
   SpellID: number;
   EffectBasePointsF: number;
+  // mists doesn't have the F :)
+  EffectBasePoints: number;
   EffectAura: number;
 }
 
@@ -33,7 +35,7 @@ export default async function temporarySpells(
       .map(
         (effect) =>
           ({
-            id: effect.EffectBasePointsF,
+            id: effect.EffectBasePointsF ?? effect.EffectBasePoints,
             grantedBy: spell.id,
             type: SpellType.Temporary,
           }) satisfies TemporarySpell,

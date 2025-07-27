@@ -48,7 +48,7 @@ export default hydrater({
                 outputEffects.push({
                     sourceSpellId: spell.id,
                     aura: effect.EffectAura,
-                    basePoints: effect.EffectBasePointsF,
+                    basePoints: effect.EffectBasePointsF ?? effect.EffectBasePoints,
                     misc0: effect.EffectMiscValue_0,
                     misc1: effect.EffectMiscValue_1,
                     pointModifiers: modifiers,
@@ -109,7 +109,8 @@ function pointModifiers(spell, effect, spellEffect, spellList) {
                 effectIndexLookup[maybeModifier.EffectMiscValue_0] ===
                     effect.EffectIndex &&
                 spell.label?.includes(maybeModifier.EffectMiscValue_1)) {
-                modifiers[otherSpell.id] = maybeModifier.EffectBasePointsF;
+                modifiers[otherSpell.id] =
+                    maybeModifier.EffectBasePointsF ?? maybeModifier.EffectBasePoints;
             }
         }
     }

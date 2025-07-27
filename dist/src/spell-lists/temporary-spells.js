@@ -8,7 +8,7 @@ export default async function temporarySpells(dbc, otherSpells) {
             .filter((effect) => effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS ||
             effect.EffectAura === EffectType.OVERRIDE_ACTIONBAR_SPELLS_TRIGGERED)
             .map((effect) => ({
-            id: effect.EffectBasePointsF,
+            id: effect.EffectBasePointsF ?? effect.EffectBasePoints,
             grantedBy: spell.id,
             type: SpellType.Temporary,
         }));
