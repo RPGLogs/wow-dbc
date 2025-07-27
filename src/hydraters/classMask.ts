@@ -49,7 +49,7 @@ export default hydrater({
  */
 export function matchesClassMask(
   spell: Output,
-  filter: Required<Output["classMask"]>,
+  filter: Required<Output>["classMask"],
 ): boolean {
   if (!spell.classMask) {
     return false;

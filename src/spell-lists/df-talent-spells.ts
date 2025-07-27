@@ -1,9 +1,5 @@
 import { type Dbc } from "../dbc.ts";
-import {
-  SpellType,
-  type AnySpell,
-  type TalentSpell,
-} from "../hydraters/internal/types.ts";
+import { SpellType, type TalentSpell } from "../hydraters/internal/types.ts";
 import { classSkillLine } from "./class-spells.ts";
 
 interface SkillLineXTraitTree {
@@ -108,6 +104,9 @@ export default async function dragonflightTalentSpells(
       return true;
     }
     const cond = traitCond.getFirst(link.TraitCondID);
+    if (!cond) {
+      return false;
+    }
     // not sure what to check besides spec set at this stage
     return specSetMember
       .getAll(cond.SpecSetID)
@@ -168,7 +167,7 @@ export default async function dragonflightTalentSpells(
             definition.OverridesSpellID > 0
               ? definition.OverridesSpellID
               : undefined,
-          type: SpellType.Talent as const,
+          type: SpellType.Talent,
         };
       });
     })

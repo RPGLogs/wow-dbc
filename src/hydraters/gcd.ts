@@ -71,7 +71,7 @@ export default hydrater({
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
     const misc = spellMisc.getFirst(input.id);
 
-    const attr0 = misc.Attributes_0 ?? 0;
+    const attr0 = misc?.Attributes_0 ?? 0;
     const isMeleeOrRangedOrAbility =
       category.DefenseType === DefenseType.Melee ||
       category.DefenseType === DefenseType.Ranged ||
@@ -137,9 +137,9 @@ function hastesGcd(effect: SpellEffect): boolean {
   return effect.aura === EffectType.MOD_GCD_BY_HASTE;
 }
 
-enum DefenseType {
-  Melee = 2,
-  Ranged = 3,
-}
+const DefenseType = {
+  Melee: 2,
+  Ranged: 3,
+};
 const IS_ABILITY_FLAG = 0x10;
 const USES_RANGED_WEAPON_FLAG = 0x2;

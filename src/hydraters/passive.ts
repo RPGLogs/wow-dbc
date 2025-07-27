@@ -44,18 +44,18 @@ export default hydrater({
 
     const { Attributes_0, Attributes_4, Attributes_8 } = spellMisc.getFirst(
       input.id,
-    );
+    )!;
 
     let hidden = undefined;
     if (Attributes_8 & NOT_IN_SPELLBOOK_UNLESS_LEARNED_FLAG) {
-      hidden = "unless-learned";
+      hidden = "unless-learned" as const;
     }
     // assume that both flags may be set at once.
     if (
       Attributes_0 & DO_NOT_DISPLAY_FLAG ||
       Attributes_4 & NOT_IN_SPELLBOOK_FLAG
     ) {
-      hidden = "always";
+      hidden = "always" as const;
     }
 
     let passive = Boolean(Attributes_0 & PASSIVE_FLAG);

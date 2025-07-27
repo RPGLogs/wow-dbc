@@ -5,6 +5,8 @@
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
-    "strict": true
+    "strict": true,
+    "erasableSyntaxOnly": true,
+    "noEmit": true
   }
 }

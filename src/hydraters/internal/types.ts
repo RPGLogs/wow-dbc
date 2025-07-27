@@ -1,12 +1,14 @@
 import type { Dbc } from "../../dbc.ts";
 
-export enum SpellType {
-  Baseline = "baseline",
-  Talent = "talent",
-  Learned = "learned",
+export const SpellType = {
+  Baseline: "baseline" as const,
+  Talent: "talent" as const,
+  Learned: "learned" as const,
   // temporary spells, typically available during a cooldown
-  Temporary = "temporary",
-}
+  Temporary: "temporary" as const,
+};
+
+export type SpellType = (typeof SpellType)[keyof typeof SpellType];
 
 interface SharedSpellProps {
   id: number;
@@ -21,7 +23,7 @@ interface SharedSpellProps {
  * selected class/spec.
  */
 export interface BaselineSpell extends SharedSpellProps {
-  type: SpellType.Baseline;
+  type: "baseline";
 }
 
 /**
@@ -29,7 +31,7 @@ export interface BaselineSpell extends SharedSpellProps {
  * availability of the spell it is `taughtBy`.
  */
 export interface LearnedSpell extends SharedSpellProps {
-  type: SpellType.Learned;
+  type: "learned";
   taughtBy: number;
 }
 
@@ -37,7 +39,7 @@ export interface LearnedSpell extends SharedSpellProps {
  * A spell that comes from a Dragonflight talent tree.
  */
 export interface TalentSpell extends SharedSpellProps {
-  type: SpellType.Talent;
+  type: "talent";
   requiresTalentEntry: number[];
   // TODO
   visibleSpellId?: number;
@@ -51,7 +53,7 @@ export interface TalentSpell extends SharedSpellProps {
  * A spell that is temporarily available, such as a temporary override due to a buff.
  */
 export interface TemporarySpell extends SharedSpellProps {
-  type: SpellType.Temporary;
+  type: "temporary";
   grantedBy: number;
 }
 
@@ -67,7 +69,7 @@ export type AnySpell =
  */
 export function hydrater<
   Output extends Record<string, any>,
-  Deps extends Record<string, Hydrater<unknown, any>>,
+  Deps extends Record<string, Hydrater<Record<string, any>, any>>,
 >(h: Record<string, any> & Hydrater<Output, Deps>): Hydrater<Output, Deps> {
   return h;
 }
@@ -80,7 +82,7 @@ export function hydrater<
  */
 export interface Hydrater<
   Output extends Record<string, any>,
-  Deps extends Record<string, Hydrater<unknown, any>>,
+  Deps extends Record<string, Hydrater<Record<string, any>, any>>,
 > {
   name: string;
   /**

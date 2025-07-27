@@ -18,7 +18,7 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
   const allHydraters = [];
   const remaining = Object.values(hydraters);
   while (remaining.length > 0) {
-    const hydrater = remaining.shift();
+    const hydrater = remaining.shift()!;
     if (addedHydraters.has(hydrater.name)) {
       continue;
     }
@@ -87,11 +87,11 @@ function topoSortHydraters(
       if (!dependents.has(dep)) {
         dependents.set(dep, []);
       }
-      dependents.get(dep).push(node);
+      dependents.get(dep)!.push(node);
     }
   }
 
-  const result = [];
+  const result: Array<Hydrater<any, any>> = [];
   const completed = new Set();
 
   const currentPath = new Set();
@@ -107,7 +107,7 @@ function topoSortHydraters(
     if (dependents.has(node)) {
       currentPath.add(node);
 
-      for (const dep of dependents.get(node)) {
+      for (const dep of dependents.get(node)!) {
         visit(dep);
       }
 

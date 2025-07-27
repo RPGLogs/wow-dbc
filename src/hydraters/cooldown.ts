@@ -5,6 +5,7 @@ import effects, {
   EffectMiscValue,
   EffectType,
   effectWithModifiers,
+  type EffectAccumulator,
 } from "./effects.ts";
 import passive from "./passive.ts";
 
@@ -50,6 +51,29 @@ export default hydrater({
       cooldown.CategoryRecoveryTime > 0
         ? cooldown.CategoryRecoveryTime
         : cooldown.RecoveryTime;
+
+    const accumulator: EffectAccumulator<Cooldown> = (acc, effect) => {
+      let duration = 0;
+      if (
+        effect.aura === EffectType.ADD_FLAT_MODIFIER &&
+        effect.misc0 === EffectMiscValue.Cooldown
+      ) {
+        duration = effect.basePoints;
+      }
+      let hasted = false;
+      if (effect.aura === EffectType.MOD_COOLDOWN_BY_HASTE) {
+        hasted = true;
+      }
+
+      if (!hasted && !duration) {
+        return acc;
+      }
+
+      return {
+        duration: (acc?.duration ?? 0) + duration,
+        hasted: Boolean(acc?.hasted) || hasted,
+      };
+    };
     const cd = effectWithModifiers(
       spellList,
       input,
@@ -57,31 +81,13 @@ export default hydrater({
         duration: baseCooldown,
         hasted: false,
       },
-      (acc, effect) => {
-        let duration = 0;
-        if (
-          effect.aura === EffectType.ADD_FLAT_MODIFIER &&
-          effect.misc0 === EffectMiscValue.Cooldown
-        ) {
-          duration = effect.basePoints;
-        }
-        let hasted = false;
-        if (effect.aura === EffectType.MOD_COOLDOWN_BY_HASTE) {
-          hasted = true;
-        }
-
-        if (!hasted && !duration) {
-          return acc;
-        }
-
-        return {
-          duration: (acc?.duration ?? 0) + duration,
-          hasted: Boolean(acc?.hasted) || hasted,
-        };
-      },
+      accumulator,
     );
 
-    if (cd.duration === 0 && (!cd.modifiers || cd.modifiers.length === 0)) {
+    if (
+      !cd ||
+      (cd.duration === 0 && (!cd.modifiers || cd.modifiers.length === 0))
+    ) {
       return {};
     }
 

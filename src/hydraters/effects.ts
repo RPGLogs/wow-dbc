@@ -128,28 +128,28 @@ function matchesCategory(
 }
 
 // see: https://github.com/Marlamin/wow.tools.local/blob/d9872d652157b720a24cc7db96543d01a7d50b29/wwwroot/js/enums.js#L1698
-export enum EffectType {
-  PERIODIC_TRIGGER_SPELL = 23,
-  ADD_FLAT_MODIFIER = 107,
-  ADD_PCT_MODIFIER = 108,
-  ADD_FLAT_MODIFIER_BY_SPELL_LABEL = 219,
-  OVERRIDE_ACTIONBAR_SPELLS = 332,
-  MOD_MAX_CHARGES = 411,
-  MOD_COOLDOWN_BY_HASTE = 416,
-  MOD_GCD_BY_HASTE = 417,
-  CHARGE_RECOVERY_MULTIPLIER = 454,
-  CHARGE_RECOVERY_BY_HASTE = 457,
-}
+export const EffectType = {
+  PERIODIC_TRIGGER_SPELL: 23,
+  ADD_FLAT_MODIFIER: 107,
+  ADD_PCT_MODIFIER: 108,
+  ADD_FLAT_MODIFIER_BY_SPELL_LABEL: 219,
+  OVERRIDE_ACTIONBAR_SPELLS: 332,
+  MOD_MAX_CHARGES: 411,
+  MOD_COOLDOWN_BY_HASTE: 416,
+  MOD_GCD_BY_HASTE: 417,
+  CHARGE_RECOVERY_MULTIPLIER: 454,
+  CHARGE_RECOVERY_BY_HASTE: 457,
+};
 
-export enum EffectMiscValue {
-  EffectIndex0 = 3,
-  Cooldown = 11,
-  EffectIndex1 = 12,
-  StartCooldown = 21,
-  EffectIndex2 = 23,
-  EffectIndex3 = 32,
-  EffectIndex4 = 33,
-}
+export const EffectMiscValue = {
+  EffectIndex0: 3,
+  Cooldown: 11,
+  EffectIndex1: 12,
+  StartCooldown: 21,
+  EffectIndex2: 23,
+  EffectIndex3: 32,
+  EffectIndex4: 33,
+};
 
 function pointModifiers(
   spell: AnySpell & { label?: number[] },
@@ -161,7 +161,7 @@ function pointModifiers(
     return [];
   }
 
-  const modifiers = {};
+  const modifiers: Record<number, number> = {};
 
   for (const otherSpell of spellList.values()) {
     const effects = spellEffect.getAll(otherSpell.id);
@@ -217,6 +217,13 @@ function isBaselinePassiveSpell(
   );
 }
 
+export interface EffectAccumulator<T> {
+  (
+    acc: T | Partial<T> | undefined,
+    effect: SpellEffect,
+  ): T | Partial<T> | undefined;
+}
+
 /**
  * Process the effects applied to a spell, producing an object that has:
  *
@@ -254,10 +261,7 @@ export function effectWithModifiers<T>(
   spellList: Map<number, AnySpell>,
   spell: AnySpell & Output,
   baselineValue: T,
-  accumulateEffectValue: (
-    acc: T | undefined,
-    effect: SpellEffect,
-  ) => T | undefined,
+  accumulateEffectValue: EffectAccumulator<T>,
 ): WithModifiers<T> | undefined {
   const effectsWithModifiers = spell.effects.flatMap((effect) => {
     const result = [{ requires: [effect.sourceSpellId], effect }];
@@ -284,7 +288,10 @@ export function effectWithModifiers<T>(
     )
     .map(({ effect }) => effect);
 
-  const base = baselineEffects.reduce(accumulateEffectValue, baselineValue);
+  const base = baselineEffects.reduce(
+    (val: T, effect: SpellEffect) => accumulateEffectValue(val, effect) as T,
+    baselineValue,
+  );
 
   const modifierEffectsBySource: Map<string, SpellEffect[]> =
     effectsWithModifiers
@@ -303,7 +310,11 @@ export function effectWithModifiers<T>(
   const modifiers: Modifier<T>[] = Array.from(modifierEffectsBySource.entries())
     .map(([key, effects]): Modifier<T> | undefined => {
       const requires = key.split(",").map(Number);
-      const result = effects.reduce(accumulateEffectValue, undefined);
+      const result = effects.reduce(
+        (val: Partial<T> | undefined, effect: SpellEffect) =>
+          accumulateEffectValue(val, effect),
+        undefined,
+      );
       if (!result) {
         return undefined;
       }
@@ -318,5 +329,5 @@ export function effectWithModifiers<T>(
   if (modifiers.length > 0) {
     return { ...base, modifiers };
   }
-  return base;
+  return base as WithModifiers<T>;
 }
