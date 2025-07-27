@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface NameOutput {
   name: string;
 }
 
@@ -12,7 +12,7 @@ interface SpellName {
 export default hydrater({
   name: "name",
   tables: [{ name: "SpellName", key: "ID" }],
-  hydrate(dbc, input): Output {
+  hydrate(dbc, input): NameOutput {
     const names = dbc.getTable<SpellName, "ID">("SpellName", "ID");
     const name = names.getFirst(input.id)?.Name_lang;
     return {

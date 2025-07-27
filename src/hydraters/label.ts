@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface LabelOutput {
   label?: number[];
 }
 
@@ -15,7 +15,7 @@ interface SpellLabel {
 export default hydrater({
   name: "label",
   tables: [{ name: "SpellLabel", key: "SpellID" }],
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): LabelOutput {
     const spellLabel = dbc.getTable<SpellLabel>("SpellLabel", "SpellID");
     const labels = spellLabel.getAll(input.id);
     if (labels.length === 0) {

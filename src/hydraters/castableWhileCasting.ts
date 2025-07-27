@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface CWCOutput {
   castableWhileCasting?: boolean;
 }
 
@@ -14,7 +14,7 @@ const flag = 0x80;
 export default hydrater({
   name: "castableWhileCasting",
   tables: [{ name: "SpellMisc", key: "SpellID" }],
-  hydrate(dbc, input): Output {
+  hydrate(dbc, input): CWCOutput {
     const misc = dbc.getTable<SpellMisc, "SpellID">("SpellMisc", "SpellID");
     const row = misc.getFirst(input.id);
 

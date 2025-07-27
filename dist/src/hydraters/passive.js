@@ -1,0 +1,46 @@
+import { hydrater } from "./internal/types.js";
+export default hydrater({
+    name: "passive",
+    tables: [
+        {
+            name: "SpellMisc",
+            key: "SpellID",
+        },
+        { name: "SpellShapeshift", key: "SpellID" },
+    ],
+    hydrate(dbc, input) {
+        const spellMisc = dbc.getTable("SpellMisc", "SpellID");
+        if (!spellMisc.getFirst(input.id)) {
+            return {
+                passive: false,
+            };
+        }
+        const { Attributes_0, Attributes_4, Attributes_8 } = spellMisc.getFirst(input.id);
+        let hidden = undefined;
+        if (Attributes_8 & NOT_IN_SPELLBOOK_UNLESS_LEARNED_FLAG) {
+            hidden = "unless-learned";
+        }
+        // assume that both flags may be set at once.
+        if (Attributes_0 & DO_NOT_DISPLAY_FLAG ||
+            Attributes_4 & NOT_IN_SPELLBOOK_FLAG) {
+            hidden = "always";
+        }
+        let passive = Boolean(Attributes_0 & PASSIVE_FLAG);
+        if (passive) {
+            const shapeshift = dbc.getTable("SpellShapeshift", "SpellID");
+            const row = shapeshift.getFirst(input.id);
+            if (row?.ShapeshiftMask_0 || row?.ShapeshiftMask_1) {
+                // this is a passive applied while within a shapeshift form. we're not fully processing shapeshifts now, but this prevents e.g. regrowth gcd modifier from cat form from applying globally
+                passive = false;
+            }
+        }
+        return {
+            passive,
+            hidden,
+        };
+    },
+});
+const PASSIVE_FLAG = 0x40;
+const DO_NOT_DISPLAY_FLAG = 0x80;
+const NOT_IN_SPELLBOOK_FLAG = 0x8000;
+const NOT_IN_SPELLBOOK_UNLESS_LEARNED_FLAG = 0x2000;

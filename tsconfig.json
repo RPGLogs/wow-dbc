@@ -7,6 +7,8 @@
     "verbatimModuleSyntax": true,
     "strict": true,
     "erasableSyntaxOnly": true,
-    "noEmit": true
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist"
   }
 }

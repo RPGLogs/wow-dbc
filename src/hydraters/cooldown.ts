@@ -9,7 +9,7 @@ import effects, {
 } from "./effects.ts";
 import passive from "./passive.ts";
 
-interface Output {
+export interface CooldownOutput {
   cooldown?: WithModifiers<Cooldown>;
 }
 
@@ -33,7 +33,7 @@ export default hydrater({
   name: "cooldown",
   tables: [{ name: "SpellCooldowns", key: "SpellID" }],
   dependencies: { charges, effects, passive },
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): CooldownOutput {
     if (input.passive || input.cooldown) {
       return {};
     }

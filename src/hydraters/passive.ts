@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface PassiveOutput {
   /**
    * Whether the spell is a passive effect.
    */
@@ -33,7 +33,7 @@ export default hydrater({
     },
     { name: "SpellShapeshift", key: "SpellID" },
   ],
-  hydrate(dbc, input): Output {
+  hydrate(dbc, input): PassiveOutput {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
 
     if (!spellMisc.getFirst(input.id)) {

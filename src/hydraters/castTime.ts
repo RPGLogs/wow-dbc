@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface CastTimeOutput {
   castTime?: {
     duration: number;
   };
@@ -23,7 +23,7 @@ export default hydrater({
     { name: "SpellMisc", key: "SpellID" },
     { name: "SpellCastTimes", key: "ID" },
   ],
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): CastTimeOutput {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
     const misc = spellMisc.getFirst(input.id);
     if (!misc || misc.CastingTimeIndex === 0) {

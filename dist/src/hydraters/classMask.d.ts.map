@@ -1,0 +1,1 @@
+{"version":3,"file":"classMask.d.ts","sourceRoot":"","sources":["../../../src/hydraters/classMask.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,eAAe;IAC9B,SAAS,CAAC,EAAE,CAAC,MAAM,EAAE,MAAM,EAAE,MAAM,EAAE,MAAM,CAAC,CAAC;CAC9C;AAUD;;;;GAIG;;AACH,wBAuBG;AAEH;;;;GAIG;AACH,wBAAgB,gBAAgB,CAC9B,KAAK,EAAE,eAAe,EACtB,MAAM,EAAE,QAAQ,CAAC,eAAe,CAAC,CAAC,WAAW,CAAC,GAC7C,OAAO,CAWT"}

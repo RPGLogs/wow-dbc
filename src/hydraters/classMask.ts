@@ -1,6 +1,6 @@
 import { hydrater } from "./internal/types.ts";
 
-interface Output {
+export interface ClassMaskOutput {
   classMask?: [number, number, number, number];
 }
 
@@ -20,7 +20,7 @@ interface SpellClassOptions {
 export default hydrater({
   name: "classMask",
   tables: [{ name: "SpellClassOptions", key: "SpellID" }],
-  hydrate(dbc, input): Output {
+  hydrate(dbc, input): ClassMaskOutput {
     const spellClassOptions = dbc.getTable<SpellClassOptions>(
       "SpellClassOptions",
       "SpellID",
@@ -48,8 +48,8 @@ export default hydrater({
  * The filter matches if for any field, `mask[i] & filter[i] != 0`.
  */
 export function matchesClassMask(
-  spell: Output,
-  filter: Required<Output>["classMask"],
+  spell: ClassMaskOutput,
+  filter: Required<ClassMaskOutput>["classMask"],
 ): boolean {
   if (!spell.classMask) {
     return false;

@@ -8,7 +8,7 @@ import effects, {
   type WithModifiers,
 } from "./effects.ts";
 
-interface Output {
+export interface GcdOutput {
   gcd?: WithModifiers<Gcd>;
 }
 
@@ -49,7 +49,7 @@ export default hydrater({
     { name: "SpellMisc", key: "SpellID" },
   ],
   dependencies: { effects, passive },
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): GcdOutput {
     if (input.passive) {
       return {};
     }

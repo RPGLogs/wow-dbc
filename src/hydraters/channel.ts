@@ -1,7 +1,7 @@
 import { hydrater } from "./internal/types.ts";
 import { EffectType } from "./effects.ts";
 
-interface Output {
+export interface ChannelOutput {
   channel?: {
     duration: number;
     hasted: boolean;
@@ -49,7 +49,7 @@ export default hydrater({
     { name: "SpellDuration", key: "ID" },
     { name: "SpellEffect", key: "SpellID" },
   ],
-  hydrate(dbc, input): Output {
+  hydrate(dbc, input): ChannelOutput {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
     const misc = spellMisc.getFirst(input.id);
     if (!misc) {

@@ -7,12 +7,12 @@ import effects, {
 import passive from "./passive.ts";
 import type { Cooldown } from "./cooldown.ts";
 
-interface Output {
+export interface ChargesOutput {
   charges?: WithModifiers<MaxCharges>;
   cooldown?: WithModifiers<Cooldown>;
 }
 
-interface MaxCharges {
+export interface MaxCharges {
   max: number;
 }
 
@@ -40,7 +40,7 @@ export default hydrater({
     { name: "SpellCategories", key: "SpellID" },
   ],
   dependencies: { passive, effects },
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): ChargesOutput {
     if (input.passive) {
       return {};
     }

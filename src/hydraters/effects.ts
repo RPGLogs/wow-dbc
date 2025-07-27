@@ -17,7 +17,7 @@ export interface SpellEffect {
   triggeredSpell?: number;
 }
 
-interface Output {
+export interface EffectsOutput {
   effects: SpellEffect[];
 }
 
@@ -57,7 +57,7 @@ export default hydrater({
     { name: "SpellEffect", key: "SpellID" },
     { name: "SpellCategories", key: "SpellID" },
   ],
-  hydrate(dbc, input, spellList): Output {
+  hydrate(dbc, input, spellList): EffectsOutput {
     const spellEffect = dbc.getTable<SpellEffectRaw, "SpellID">(
       "SpellEffect",
       "SpellID",
@@ -259,7 +259,7 @@ export interface EffectAccumulator<T> {
  */
 export function effectWithModifiers<T>(
   spellList: Map<number, AnySpell>,
-  spell: AnySpell & Output,
+  spell: AnySpell & EffectsOutput,
   baselineValue: T,
   accumulateEffectValue: EffectAccumulator<T>,
 ): WithModifiers<T> | undefined {
