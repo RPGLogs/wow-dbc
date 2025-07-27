@@ -35,7 +35,10 @@ export default async function temporarySpells(
       .map(
         (effect) =>
           ({
-            id: effect.EffectBasePointsF ?? effect.EffectBasePoints,
+            id:
+              effect.EffectBasePointsF === 0
+                ? effect.EffectBasePoints
+                : effect.EffectBasePointsF,
             grantedBy: spell.id,
             type: SpellType.Temporary,
           }) satisfies TemporarySpell,
