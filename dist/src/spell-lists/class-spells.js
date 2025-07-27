@@ -4,11 +4,14 @@ export function isRemovedSpell(dbc, spellId) {
     return table.getFirst(spellId) === undefined;
 }
 // magic flag for class skill line
-const CLASS_SKILL_FLAGS = 0x418;
+const CLASS_SKILL_FLAGS = 0x410;
+// TODO: not sure if we need this. it is currently not used. need to hook things up to retail again and see if classmask+base flags is enough
+const RETAIL_CLASS_EXTRA_FLAGS = 0x8;
 export async function classSkillLine(dbc, classId) {
     const skillRaceClassInfo = await dbc.loadTable("SkillRaceClassInfo", "Flags");
     return skillRaceClassInfo
-        .getAll(CLASS_SKILL_FLAGS)
+        .contents()
+        .filter(({ Flags }) => (Flags & CLASS_SKILL_FLAGS) > 0)
         .find(({ ClassMask }) => ClassMask === 2 ** (classId - 1))?.SkillID;
 }
 export default async function classSpells(dbc, classId) {
