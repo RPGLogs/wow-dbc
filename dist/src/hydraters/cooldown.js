@@ -18,9 +18,9 @@ export default hydrater({
         if (!cooldown) {
             return {};
         }
-        const baseCooldown = cooldown.CategoryRecoveryTime > 0
-            ? cooldown.CategoryRecoveryTime
-            : cooldown.RecoveryTime;
+        const baseCooldown = cooldown.RecoveryTime > 0
+            ? cooldown.RecoveryTime
+            : cooldown.CategoryRecoveryTime;
         const accumulator = (acc, effect) => {
             let duration = 0;
             if (effect.aura === EffectType.ADD_FLAT_MODIFIER &&

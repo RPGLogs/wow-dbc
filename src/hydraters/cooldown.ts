@@ -20,7 +20,6 @@ export interface Cooldown {
 
 interface SpellCooldown {
   SpellID: number;
-  // not entirely sure on the interactions between CategoryRecoveryTime and RecoveryTime, but based on Ice Block it looks like the former takes precedence?
   CategoryRecoveryTime: number;
   RecoveryTime: number;
   StartRecoveryTime: number;
@@ -48,9 +47,9 @@ export default hydrater({
     }
 
     const baseCooldown =
-      cooldown.CategoryRecoveryTime > 0
-        ? cooldown.CategoryRecoveryTime
-        : cooldown.RecoveryTime;
+      cooldown.RecoveryTime > 0
+        ? cooldown.RecoveryTime
+        : cooldown.CategoryRecoveryTime;
 
     const accumulator: EffectAccumulator<Cooldown> = (acc, effect) => {
       let duration = 0;
