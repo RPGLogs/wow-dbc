@@ -13,6 +13,7 @@ import learnedSpells from "./src/spell-lists/learned-spells.js";
 import specSpells from "./src/spell-lists/spec-spells.js";
 import temporarySpells from "./src/spell-lists/temporary-spells.js";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.js";
+import icon from "./src/hydraters/icon.js";
 export { dbc } from "./src/dbc.js";
 const retailSpellPreset = {
     castTime,
@@ -23,6 +24,7 @@ const retailSpellPreset = {
     name,
     passive,
     castableWhileCasting,
+    icon,
 };
 export const PRESETS = {
     RETAIL: retailSpellPreset,

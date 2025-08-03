@@ -36,6 +36,7 @@ declare const retailSpellPreset: {
     name: Hydrater<import("./src/hydraters/name.ts").NameOutput, Record<string, Hydrater<Record<string, any>, any>>>;
     passive: Hydrater<import("./src/hydraters/passive.ts").PassiveOutput, Record<string, Hydrater<Record<string, any>, any>>>;
     castableWhileCasting: Hydrater<import("./src/hydraters/castableWhileCasting.ts").CWCOutput, Record<string, Hydrater<Record<string, any>, any>>>;
+    icon: Hydrater<import("./src/hydraters/icon.ts").IconOutput, Record<string, Hydrater<Record<string, any>, any>>>;
 };
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
 export type HydraterDefinition = Record<string, Hydrater<any, any>>;
@@ -74,6 +75,7 @@ export declare const PRESETS: {
         name: Hydrater<import("./src/hydraters/name.ts").NameOutput, Record<string, Hydrater<Record<string, any>, any>>>;
         passive: Hydrater<import("./src/hydraters/passive.ts").PassiveOutput, Record<string, Hydrater<Record<string, any>, any>>>;
         castableWhileCasting: Hydrater<import("./src/hydraters/castableWhileCasting.ts").CWCOutput, Record<string, Hydrater<Record<string, any>, any>>>;
+        icon: Hydrater<import("./src/hydraters/icon.ts").IconOutput, Record<string, Hydrater<Record<string, any>, any>>>;
     };
 };
 export declare function loadAll<H extends HydraterDefinition>(hydraterDef: H, dbc: Dbc, spellList: AnySpell[]): Promise<FinalOutput<H>[]>;

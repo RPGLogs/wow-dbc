@@ -19,6 +19,7 @@ import learnedSpells from "./src/spell-lists/learned-spells.ts";
 import specSpells from "./src/spell-lists/spec-spells.ts";
 import temporarySpells from "./src/spell-lists/temporary-spells.ts";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.ts";
+import icon from "./src/hydraters/icon.ts";
 export { dbc } from "./src/dbc.ts";
 
 const retailSpellPreset = {
@@ -30,6 +31,7 @@ const retailSpellPreset = {
   name,
   passive,
   castableWhileCasting,
+  icon,
 };
 
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
