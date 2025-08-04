@@ -44,4 +44,4 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run prepack
-      - run: git diff --quiet dist/
+      - run: git diff --exit-code --stat dist/

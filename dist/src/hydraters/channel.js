@@ -43,7 +43,7 @@ export default hydrater({
             period: effect.EffectAuraPeriod,
             hasted: periodicHasted,
         }));
-        const buffIsLogged = !Boolean(misc.Attributes_6 & BUFF_IS_LOGGED_MASK);
+        const buffIsLogged = !(misc.Attributes_6 & BUFF_IS_LOGGED_MASK);
         // TODO: there are probably effects that adjust the duration or modify the trigger period
         return {
             channel: {

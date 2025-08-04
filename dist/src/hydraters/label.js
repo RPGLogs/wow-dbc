@@ -5,7 +5,7 @@ import { hydrater } from "./internal/types.js";
 export default hydrater({
     name: "label",
     tables: [{ name: "SpellLabel", key: "SpellID" }],
-    hydrate(dbc, input, spellList) {
+    hydrate(dbc, input) {
         const spellLabel = dbc.getTable("SpellLabel", "SpellID");
         const labels = spellLabel.getAll(input.id);
         if (labels.length === 0) {

@@ -3,6 +3,6 @@ export interface CastTimeOutput {
         duration: number;
     };
 }
-declare const _default: import("./internal/types.ts").Hydrater<CastTimeOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
+declare const _default: import("./internal/types.ts").Hydrater<CastTimeOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
 export default _default;
 //# sourceMappingURL=castTime.d.ts.map

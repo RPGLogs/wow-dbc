@@ -81,6 +81,8 @@ async function getTable(name, buildVersion) {
  * Generate a `Dbc` object with build version `buildVersion`.
  */
 export function dbc(buildVersion) {
+    // this any doesn't leak and is useful for typing an internal cache
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cache = {};
     return {
         getTable(name, key) {
@@ -96,6 +98,7 @@ export function dbc(buildVersion) {
                 return cache[cacheKey];
             }
             const records = await getTable(name, buildVersion);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             cache[cacheKey] = new Table(records, key);
             return cache[cacheKey];
         },

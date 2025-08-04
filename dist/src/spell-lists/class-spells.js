@@ -6,6 +6,7 @@ export function isRemovedSpell(dbc, spellId) {
 // magic flag for class skill line
 const CLASS_SKILL_FLAGS = 0x410;
 // TODO: not sure if we need this. it is currently not used. need to hook things up to retail again and see if classmask+base flags is enough
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RETAIL_CLASS_EXTRA_FLAGS = 0x8;
 export async function classSkillLine(dbc, classId) {
     const skillRaceClassInfo = await dbc.loadTable("SkillRaceClassInfo", "Flags");

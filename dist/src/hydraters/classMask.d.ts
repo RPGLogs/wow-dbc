@@ -6,7 +6,7 @@ export interface ClassMaskOutput {
  *
  * The `matchesClassMask` method implements checking if a spell matches a class mask retrieved from another source.
  */
-declare const _default: import("./internal/types.ts").Hydrater<ClassMaskOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
+declare const _default: import("./internal/types.ts").Hydrater<ClassMaskOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
 export default _default;
 /**
  * Check if the provided filter matches the class mask for `spell`.

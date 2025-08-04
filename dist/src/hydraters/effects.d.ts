@@ -27,8 +27,8 @@ export interface EffectsOutput {
  * See `gcd` for example usage.
  */
 declare const _default: import("./internal/types.ts").Hydrater<EffectsOutput, {
-    classMask: import("./internal/types.ts").Hydrater<import("./classMask.ts").ClassMaskOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
-    label: import("./internal/types.ts").Hydrater<import("./label.ts").LabelOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
+    classMask: import("./internal/types.ts").Hydrater<import("./classMask.ts").ClassMaskOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
+    label: import("./internal/types.ts").Hydrater<import("./label.ts").LabelOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
 }>;
 export default _default;
 export declare const EffectType: {

@@ -26,6 +26,7 @@ export async function doHydration(hydraters, dbc, spellList) {
         }
         spellmap.set(spell.id, spell);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     TIMERS && console.time("table load");
     // begin by pre-caching all the tables
     const uniqueTables = new Set();
@@ -40,7 +41,9 @@ export async function doHydration(hydraters, dbc, spellList) {
         return true;
     })
         // TODO this will make duplicate http requests for the same table if there are multiple keys for a table
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((ref) => dbc.loadTable(ref.name, ref.key)));
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     TIMERS && console.timeEnd("table load");
     const buildOrder = topoSortHydraters(allHydraters);
     for (const hydrater of buildOrder) {

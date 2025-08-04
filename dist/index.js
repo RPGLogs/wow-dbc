@@ -4,7 +4,7 @@ import charges from "./src/hydraters/charges.js";
 import cooldown from "./src/hydraters/cooldown.js";
 import castableWhileCasting from "./src/hydraters/castableWhileCasting.js";
 import gcd from "./src/hydraters/gcd.js";
-import { doHydration, } from "./src/hydraters/index.js";
+import { doHydration } from "./src/hydraters/index.js";
 import name from "./src/hydraters/name.js";
 import passive from "./src/hydraters/passive.js";
 import classSpells from "./src/spell-lists/class-spells.js";

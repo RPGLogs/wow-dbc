@@ -2,14 +2,14 @@
  * Handle for dbc table lookup.
  */
 export interface Dbc {
-    loadTable<T extends Record<string, any>, Key extends keyof T = keyof T>(name: string, key: Key): Promise<Table<T, Key>>;
-    getTable<T extends Record<string, any>, Key extends keyof T = keyof T>(name: string, key: Key): Table<T, Key>;
+    loadTable<T extends object, Key extends keyof T = keyof T>(name: string, key: Key): Promise<Table<T, Key>>;
+    getTable<T extends object, Key extends keyof T = keyof T>(name: string, key: Key): Table<T, Key>;
     buildVersion: string;
 }
 /**
  * A reference to a DBC table in memory, indexed by `K`.
  */
-export declare class Table<T extends Record<string, any>, K extends keyof T> {
+export declare class Table<T extends object, K extends keyof T> {
     private readonly data;
     readonly key: K;
     constructor(data: T[], key: K);

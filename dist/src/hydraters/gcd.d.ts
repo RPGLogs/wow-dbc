@@ -15,10 +15,10 @@ interface Gcd {
  */
 declare const _default: import("./internal/types.ts").Hydrater<GcdOutput, {
     effects: import("./internal/types.ts").Hydrater<import("./effects.ts").EffectsOutput, {
-        classMask: import("./internal/types.ts").Hydrater<import("./classMask.ts").ClassMaskOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
-        label: import("./internal/types.ts").Hydrater<import("./label.ts").LabelOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
+        classMask: import("./internal/types.ts").Hydrater<import("./classMask.ts").ClassMaskOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
+        label: import("./internal/types.ts").Hydrater<import("./label.ts").LabelOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
     }>;
-    passive: import("./internal/types.ts").Hydrater<import("./passive.ts").PassiveOutput, Record<string, import("./internal/types.ts").Hydrater<Record<string, any>, any>>>;
+    passive: import("./internal/types.ts").Hydrater<import("./passive.ts").PassiveOutput, Record<string, import("./internal/types.ts").AnyHydrater>>;
 }>;
 export default _default;
 //# sourceMappingURL=gcd.d.ts.map
