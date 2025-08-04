@@ -14,13 +14,15 @@ interface SkillLineAbility {
 }
 
 export function isRemovedSpell(dbc: Dbc, spellId: number): boolean {
-  const table = dbc.getTable("Spell", "ID");
+  const table = dbc.getTable<{ ID: number }>("Spell", "ID");
   return table.getFirst(spellId) === undefined;
 }
 
 // magic flag for class skill line
 const CLASS_SKILL_FLAGS = 0x410;
+
 // TODO: not sure if we need this. it is currently not used. need to hook things up to retail again and see if classmask+base flags is enough
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const RETAIL_CLASS_EXTRA_FLAGS = 0x8;
 
 export async function classSkillLine(
@@ -50,7 +52,7 @@ export default async function classSpells(
     "SkillLineAbility",
     "SkillLine",
   );
-  await dbc.loadTable("Spell", "ID");
+  await dbc.loadTable<{ ID: number }>("Spell", "ID");
   return skillLineAbilities
     .getAll(skillLineId)
     .filter(({ Spell }) => !isRemovedSpell(dbc, Spell))

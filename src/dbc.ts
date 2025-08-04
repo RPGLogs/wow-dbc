@@ -6,11 +6,11 @@ import * as udsv from "udsv";
  * Handle for dbc table lookup.
  */
 export interface Dbc {
-  loadTable<T extends Record<string, any>, Key extends keyof T = keyof T>(
+  loadTable<T extends object, Key extends keyof T = keyof T>(
     name: string,
     key: Key,
   ): Promise<Table<T, Key>>;
-  getTable<T extends Record<string, any>, Key extends keyof T = keyof T>(
+  getTable<T extends object, Key extends keyof T = keyof T>(
     name: string,
     key: Key,
   ): Table<T, Key>;
@@ -69,7 +69,7 @@ async function getTableData(
 /**
  * A reference to a DBC table in memory, indexed by `K`.
  */
-export class Table<T extends Record<string, any>, K extends keyof T> {
+export class Table<T extends object, K extends keyof T> {
   private readonly data: Map<T[K], T[]>;
   public readonly key: K;
 
@@ -100,20 +100,22 @@ export class Table<T extends Record<string, any>, K extends keyof T> {
   }
 }
 
-async function getTable<T extends Record<string, any>>(
+async function getTable<T extends object>(
   name: string,
   buildVersion: string,
 ): Promise<Array<T>> {
   const rawCsv = await getTableData(name, buildVersion);
   const schema = udsv.inferSchema(rawCsv);
   const parser = udsv.initParser(schema);
-  return parser.typedObjs(rawCsv);
+  return parser.typedObjs(rawCsv) as T[];
 }
 
 /**
  * Generate a `Dbc` object with build version `buildVersion`.
  */
 export function dbc(buildVersion: string): Dbc {
+  // this any doesn't leak and is useful for typing an internal cache
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cache: Record<string, Table<any, any>> = {};
   return {
     getTable(name, key) {
@@ -129,7 +131,8 @@ export function dbc(buildVersion: string): Dbc {
         return cache[cacheKey];
       }
       const records = await getTable(name, buildVersion);
-      cache[cacheKey] = new Table(records, key as string);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cache[cacheKey] = new Table<any, any>(records, key as string);
       return cache[cacheKey];
     },
     buildVersion,

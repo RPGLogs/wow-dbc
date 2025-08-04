@@ -23,7 +23,7 @@ export default hydrater({
     { name: "SpellMisc", key: "SpellID" },
     { name: "SpellCastTimes", key: "ID" },
   ],
-  hydrate(dbc, input, spellList): CastTimeOutput {
+  hydrate(dbc, input): CastTimeOutput {
     const spellMisc = dbc.getTable<SpellMisc>("SpellMisc", "SpellID");
     const misc = spellMisc.getFirst(input.id);
     if (!misc || misc.CastingTimeIndex === 0) {

@@ -76,9 +76,9 @@ export type AnySpell =
  * manual type annotations.
  */
 export function hydrater<
-  Output extends Record<string, any>,
-  Deps extends Record<string, Hydrater<Record<string, any>, any>>,
->(h: Record<string, any> & Hydrater<Output, Deps>): Hydrater<Output, Deps> {
+  Output extends object,
+  Deps extends Record<string, AnyHydrater>,
+>(h: Record<string, unknown> & Hydrater<Output, Deps>): Hydrater<Output, Deps> {
   return h;
 }
 
@@ -89,8 +89,8 @@ export function hydrater<
  * (mostly) independent objects.
  */
 export interface Hydrater<
-  Output extends Record<string, any>,
-  Deps extends Record<string, Hydrater<Record<string, any>, any>>,
+  Output extends object,
+  Deps extends Record<string, AnyHydrater>,
 > {
   name: string;
   /**
@@ -122,9 +122,16 @@ interface TableRef {
   key: string;
 }
 
+// recursive type doesn't check successfully using `unknown`. we need `any` here.
+// maybe recursive typing was a mistake, but :shrug: it works
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyHydrater = Hydrater<any, any>;
+
+// `unknown` doesn't satisfy the recursive type constraint
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Output<T> = T extends Hydrater<infer Out, any> ? Out : never;
 
-type InputRaw<T extends Record<string, Hydrater<any, any>>> = {
+type InputRaw<T extends Record<string, AnyHydrater>> = {
   [k in keyof T]: (x: Output<T[k]>) => void;
 }[keyof T] extends (x: infer I) => void
   ? I
@@ -134,14 +141,14 @@ type InputRaw<T extends Record<string, Hydrater<any, any>>> = {
  * Inner type that "flattens" a composed type. This is helpful for type tooltips,
  * especially if you narrow the result to a single spell type.
  */
-type InputFlat<Base, T extends Record<string, Hydrater<any, any>>> = Base & {
+type InputFlat<Base, T extends Record<string, AnyHydrater>> = Base & {
   [k in keyof InputRaw<T>]: InputRaw<T>[k];
 };
 
 /**
  * The input of a `Hydrater`, defined by its `Deps` (aka `T`).
  */
-export type Input<T extends Record<string, Hydrater<any, any>>> =
+export type Input<T extends Record<string, AnyHydrater>> =
   | InputFlat<BaselineSpell, T>
   | InputFlat<TalentSpell, T>
   | InputFlat<LearnedSpell, T>

@@ -6,14 +6,22 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "prepack": "tsc"
+    "prepack": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint:format": "prettier -c index.ts src/**/*.ts util/**/*.ts",
+    "lint:check": "eslint",
+    "lint": "pnpm run lint:format && pnpm run lint:check",
+    "format": "prettier -w index.ts src/**/*.ts util/**/*.ts"
   },
   "keywords": [],
   "author": "",
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "@types/node": "^22.13.2",
+    "eslint": "^9.32.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8"
+    "typescript": "^5.8",
+    "typescript-eslint": "^8.39.0"
   },
   "dependencies": {
     "udsv": "^0.6.0"

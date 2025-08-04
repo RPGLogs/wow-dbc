@@ -5,12 +5,8 @@ import charges from "./src/hydraters/charges.ts";
 import cooldown from "./src/hydraters/cooldown.ts";
 import castableWhileCasting from "./src/hydraters/castableWhileCasting.ts";
 import gcd from "./src/hydraters/gcd.ts";
-import {
-  doHydration,
-  type FinalOutput,
-  type Hydrater,
-} from "./src/hydraters/index.ts";
-import type { AnySpell } from "./src/hydraters/internal/types.ts";
+import { doHydration, type FinalOutput } from "./src/hydraters/index.ts";
+import type { AnyHydrater, AnySpell } from "./src/hydraters/internal/types.ts";
 import name from "./src/hydraters/name.ts";
 import passive from "./src/hydraters/passive.ts";
 import classSpells from "./src/spell-lists/class-spells.ts";
@@ -35,7 +31,7 @@ const retailSpellPreset = {
 };
 
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
-export type HydraterDefinition = Record<string, Hydrater<any, any>>;
+export type HydraterDefinition = Record<string, AnyHydrater>;
 
 export const PRESETS = {
   RETAIL: retailSpellPreset,

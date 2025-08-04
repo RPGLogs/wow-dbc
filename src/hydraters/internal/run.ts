@@ -1,15 +1,14 @@
 import type { Dbc } from "../../dbc.ts";
-import type { AnySpell, Hydrater, Input } from "./types.ts";
+import type { AnySpell, Input, AnyHydrater } from "./types.ts";
 
 const TIMERS = false;
-export type FinalOutput<T extends Record<string, Hydrater<any, any>>> =
-  Input<T>;
+export type FinalOutput<T extends Record<string, AnyHydrater>> = Input<T>;
 
 /**
  * Apply a collection of `Hydrater`s to a list of spells, producing a list of spell objects.
  * The output is not guaranteed to be the same order as the input.
  */
-export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
+export async function doHydration<H extends Record<string, AnyHydrater>>(
   hydraters: H,
   dbc: Dbc,
   spellList: AnySpell[],
@@ -25,7 +24,7 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
     addedHydraters.add(hydrater.name);
     allHydraters.push(hydrater);
     if (hydrater.dependencies) {
-      const deps = Object.values(hydrater.dependencies) as Hydrater<any, any>[];
+      const deps = Object.values(hydrater.dependencies) as AnyHydrater[];
       remaining.push(...deps);
     }
   }
@@ -38,6 +37,7 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
     spellmap.set(spell.id, spell);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   TIMERS && console.time("table load");
   // begin by pre-caching all the tables
   const uniqueTables = new Set();
@@ -53,8 +53,10 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
         return true;
       })
       // TODO this will make duplicate http requests for the same table if there are multiple keys for a table
-      .map((ref) => dbc.loadTable(ref.name, ref.key)),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((ref) => dbc.loadTable<any, string>(ref.name, ref.key)),
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   TIMERS && console.timeEnd("table load");
 
   const buildOrder = topoSortHydraters(allHydraters);
@@ -73,17 +75,13 @@ export async function doHydration<H extends Record<string, Hydrater<any, any>>>(
  *
  * @throws {Error} if the hydraters contain a dependency cycle.
  */
-function topoSortHydraters(
-  hydraters: Array<Hydrater<any, any>>,
-): Array<Hydrater<any, any>> {
-  const dependents: Map<Hydrater<any, any>, Hydrater<any, any>[]> = new Map();
+function topoSortHydraters(hydraters: Array<AnyHydrater>): Array<AnyHydrater> {
+  const dependents: Map<AnyHydrater, AnyHydrater[]> = new Map();
   for (const node of hydraters) {
     if (!node.dependencies) {
       continue;
     }
-    for (const dep of Object.values(node.dependencies) as Array<
-      Hydrater<any, any>
-    >) {
+    for (const dep of Object.values(node.dependencies) as Array<AnyHydrater>) {
       if (!dependents.has(dep)) {
         dependents.set(dep, []);
       }
@@ -91,12 +89,12 @@ function topoSortHydraters(
     }
   }
 
-  const result: Array<Hydrater<any, any>> = [];
+  const result: Array<AnyHydrater> = [];
   const completed = new Set();
 
   const currentPath = new Set();
 
-  function visit(node: Hydrater<any, any>) {
+  function visit(node: AnyHydrater) {
     if (completed.has(node)) {
       return;
     }
