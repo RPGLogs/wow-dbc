@@ -16,6 +16,7 @@ import specSpells from "./src/spell-lists/spec-spells.ts";
 import temporarySpells from "./src/spell-lists/temporary-spells.ts";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.ts";
 import icon from "./src/hydraters/icon.ts";
+import glyphSpells from "./src/spell-lists/glyph-spells.ts";
 export { dbc } from "./src/dbc.ts";
 
 const retailSpellPreset = {
@@ -111,6 +112,7 @@ export async function classicSpellList(
     classSpells(dbc, classId),
     specSpells(dbc, specId),
     mistsTalentSpells(dbc, classId, specId),
+    glyphSpells(dbc, classId),
   ]);
 
   const spellList = spellLists.flat();

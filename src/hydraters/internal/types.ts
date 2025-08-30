@@ -56,6 +56,12 @@ export interface MistsTalentSpell extends SharedSpellProps {
   column: number;
 }
 
+export interface GlyphSpell extends SharedSpellProps {
+  type: "glyph";
+  glyphId: number;
+  glyphItemId: number;
+}
+
 /**
  * A spell that is temporarily available, such as a temporary override due to a buff.
  */
@@ -69,7 +75,8 @@ export type AnySpell =
   | LearnedSpell
   | TalentSpell
   | TemporarySpell
-  | MistsTalentSpell;
+  | MistsTalentSpell
+  | GlyphSpell;
 
 /**
  * Build a hydrater. This method triggers type inferrence in a way that *mostly* doesn't require
@@ -153,4 +160,5 @@ export type Input<T extends Record<string, AnyHydrater>> =
   | InputFlat<TalentSpell, T>
   | InputFlat<LearnedSpell, T>
   | InputFlat<TemporarySpell, T>
-  | InputFlat<MistsTalentSpell, T>;
+  | InputFlat<MistsTalentSpell, T>
+  | InputFlat<GlyphSpell, T>;

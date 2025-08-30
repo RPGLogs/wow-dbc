@@ -14,6 +14,7 @@ import specSpells from "./src/spell-lists/spec-spells.js";
 import temporarySpells from "./src/spell-lists/temporary-spells.js";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.js";
 import icon from "./src/hydraters/icon.js";
+import glyphSpells from "./src/spell-lists/glyph-spells.js";
 export { dbc } from "./src/dbc.js";
 const retailSpellPreset = {
     castTime,
@@ -74,6 +75,7 @@ export async function classicSpellList(dbc, specId) {
         classSpells(dbc, classId),
         specSpells(dbc, specId),
         mistsTalentSpells(dbc, classId, specId),
+        glyphSpells(dbc, classId),
     ]);
     const spellList = spellLists.flat();
     const withLearnedSpells = spellList.concat(await learnedSpells(dbc, spellList));

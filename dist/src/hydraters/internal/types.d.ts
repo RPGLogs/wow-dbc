@@ -46,6 +46,11 @@ export interface MistsTalentSpell extends SharedSpellProps {
     row: number;
     column: number;
 }
+export interface GlyphSpell extends SharedSpellProps {
+    type: "glyph";
+    glyphId: number;
+    glyphItemId: number;
+}
 /**
  * A spell that is temporarily available, such as a temporary override due to a buff.
  */
@@ -53,7 +58,7 @@ export interface TemporarySpell extends SharedSpellProps {
     type: "temporary";
     grantedBy: number;
 }
-export type AnySpell = BaselineSpell | LearnedSpell | TalentSpell | TemporarySpell | MistsTalentSpell;
+export type AnySpell = BaselineSpell | LearnedSpell | TalentSpell | TemporarySpell | MistsTalentSpell | GlyphSpell;
 /**
  * Build a hydrater. This method triggers type inferrence in a way that *mostly* doesn't require
  * manual type annotations.
@@ -105,6 +110,6 @@ type InputFlat<Base, T extends Record<string, AnyHydrater>> = Base & {
 /**
  * The input of a `Hydrater`, defined by its `Deps` (aka `T`).
  */
-export type Input<T extends Record<string, AnyHydrater>> = InputFlat<BaselineSpell, T> | InputFlat<TalentSpell, T> | InputFlat<LearnedSpell, T> | InputFlat<TemporarySpell, T> | InputFlat<MistsTalentSpell, T>;
+export type Input<T extends Record<string, AnyHydrater>> = InputFlat<BaselineSpell, T> | InputFlat<TalentSpell, T> | InputFlat<LearnedSpell, T> | InputFlat<TemporarySpell, T> | InputFlat<MistsTalentSpell, T> | InputFlat<GlyphSpell, T>;
 export {};
 //# sourceMappingURL=types.d.ts.map
