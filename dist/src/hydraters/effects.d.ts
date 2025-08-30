@@ -12,6 +12,21 @@ export interface SpellEffect {
 export interface EffectsOutput {
     effects: SpellEffect[];
 }
+export interface SpellEffectRaw {
+    SpellID: number;
+    EffectIndex: number;
+    EffectSpellClassMask_0: number;
+    EffectSpellClassMask_1: number;
+    EffectSpellClassMask_2: number;
+    EffectSpellClassMask_3: number;
+    EffectAura: number;
+    EffectAuraPeriod: number;
+    EffectMiscValue_0: number;
+    EffectMiscValue_1: number;
+    EffectBasePointsF: number;
+    EffectBasePoints: number;
+    EffectTriggerSpell: number;
+}
 /**
  * Populate the effects that are applied to a spell by other spells.
  *

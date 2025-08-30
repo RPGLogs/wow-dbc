@@ -21,7 +21,7 @@ export interface EffectsOutput {
   effects: SpellEffect[];
 }
 
-interface SpellEffectRaw {
+export interface SpellEffectRaw {
   SpellID: number;
   EffectIndex: number;
   EffectSpellClassMask_0: number;

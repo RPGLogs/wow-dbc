@@ -16,6 +16,7 @@ import specSpells from "./src/spell-lists/spec-spells.ts";
 import temporarySpells from "./src/spell-lists/temporary-spells.ts";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.ts";
 import icon from "./src/hydraters/icon.ts";
+import temporaryOverride from "./src/hydraters/temporaryOverride.ts";
 import glyphSpells from "./src/spell-lists/glyph-spells.ts";
 export { dbc } from "./src/dbc.ts";
 
@@ -29,6 +30,7 @@ const retailSpellPreset = {
   passive,
   castableWhileCasting,
   icon,
+  temporaryOverride,
 };
 
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;

@@ -14,6 +14,7 @@ import specSpells from "./src/spell-lists/spec-spells.js";
 import temporarySpells from "./src/spell-lists/temporary-spells.js";
 import mistsTalentSpells from "./src/spell-lists/mists-talent-spells.js";
 import icon from "./src/hydraters/icon.js";
+import temporaryOverride from "./src/hydraters/temporaryOverride.js";
 import glyphSpells from "./src/spell-lists/glyph-spells.js";
 export { dbc } from "./src/dbc.js";
 const retailSpellPreset = {
@@ -26,6 +27,7 @@ const retailSpellPreset = {
     passive,
     castableWhileCasting,
     icon,
+    temporaryOverride,
 };
 export const PRESETS = {
     RETAIL: retailSpellPreset,

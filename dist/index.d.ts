@@ -37,6 +37,9 @@ declare const retailSpellPreset: {
     passive: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/passive.ts").PassiveOutput, Record<string, AnyHydrater>>;
     castableWhileCasting: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/castableWhileCasting.ts").CWCOutput, Record<string, AnyHydrater>>;
     icon: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/icon.ts").IconOutput, Record<string, AnyHydrater>>;
+    temporaryOverride: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/temporaryOverride.ts").TemporaryOverrideOutput, {
+        classMask: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/classMask.ts").ClassMaskOutput, Record<string, AnyHydrater>>;
+    }>;
 };
 export type RetailSpell = FinalOutput<typeof retailSpellPreset>;
 export type HydraterDefinition = Record<string, AnyHydrater>;
@@ -76,6 +79,9 @@ export declare const PRESETS: {
         passive: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/passive.ts").PassiveOutput, Record<string, AnyHydrater>>;
         castableWhileCasting: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/castableWhileCasting.ts").CWCOutput, Record<string, AnyHydrater>>;
         icon: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/icon.ts").IconOutput, Record<string, AnyHydrater>>;
+        temporaryOverride: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/temporaryOverride.ts").TemporaryOverrideOutput, {
+            classMask: import("./src/hydraters/index.ts").Hydrater<import("./src/hydraters/classMask.ts").ClassMaskOutput, Record<string, AnyHydrater>>;
+        }>;
     };
 };
 export declare function loadAll<H extends HydraterDefinition>(hydraterDef: H, dbc: Dbc, spellList: AnySpell[]): Promise<FinalOutput<H>[]>;
