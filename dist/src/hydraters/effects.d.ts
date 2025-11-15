@@ -113,4 +113,5 @@ export interface EffectAccumulator<T> {
  *
  */
 export declare function effectWithModifiers<T>(spellList: Map<number, AnySpell>, spell: AnySpell & EffectsOutput, baselineValue: T, accumulateEffectValue: EffectAccumulator<T>): WithModifiers<T> | undefined;
+export declare function applyModifiers<T>(effect: WithModifiers<T>, isKnownSpell: (spellId: number) => boolean): T;
 //# sourceMappingURL=effects.d.ts.map

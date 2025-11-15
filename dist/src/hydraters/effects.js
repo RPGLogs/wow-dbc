@@ -223,3 +223,29 @@ export function effectWithModifiers(spellList, spell, baselineValue, accumulateE
     }
     return base;
 }
+export function applyModifiers(effect, isKnownSpell) {
+    const { modifiers, ...base } = effect;
+    if (!modifiers) {
+        return base;
+    }
+    const result = base;
+    for (const { requiredSpells, ...modifier } of modifiers) {
+        if (requiredSpells.some((spellId) => !isKnownSpell(spellId))) {
+            // one of the required spells is not known, do not apply the modifier.
+            continue;
+        }
+        // modifier is known, merge into base
+        let key;
+        for (key in modifier) {
+            const value = modifier[key];
+            if (typeof value === "number") {
+                // ugly casting to work around TS inability to infer transitive relationship here
+                result[key] = (value + (result[key] ?? 0));
+            }
+            else {
+                result[key] = value;
+            }
+        }
+    }
+    return result;
+}

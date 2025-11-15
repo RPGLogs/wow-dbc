@@ -340,3 +340,38 @@ export function effectWithModifiers<T>(
   }
   return base as WithModifiers<T>;
 }
+
+export function applyModifiers<T>(
+  effect: WithModifiers<T>,
+  isKnownSpell: (spellId: number) => boolean,
+): T {
+  const { modifiers, ...base } = effect;
+
+  if (!modifiers) {
+    return base as T;
+  }
+
+  const result = base as T;
+
+  for (const { requiredSpells, ...modifier } of modifiers) {
+    if (requiredSpells.some((spellId) => !isKnownSpell(spellId))) {
+      // one of the required spells is not known, do not apply the modifier.
+      continue;
+    }
+
+    // modifier is known, merge into base
+    let key: keyof T;
+    for (key in modifier) {
+      const value = (modifier as T)[key];
+
+      if (typeof value === "number") {
+        // ugly casting to work around TS inability to infer transitive relationship here
+        result[key] = (value + ((result[key] as number) ?? 0)) as T[typeof key];
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+
+  return result;
+}

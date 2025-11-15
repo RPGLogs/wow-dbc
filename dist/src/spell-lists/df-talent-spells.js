@@ -20,18 +20,26 @@ export default async function dragonflightTalentSpells(dbc, classId, specId) {
     const specSetMember = await dbc.loadTable("SpecSetMember", "SpecSet");
     const specNodes = allNodes.filter((node) => {
         const link = traitNodesToConds.getFirst(node.ID);
-        if (!link) {
-            // guesswork. unconditional
-            return true;
+        const conds = traitNodesToGroups
+            .getAll(node.ID)
+            .flatMap((group) => traitGroupsToConds.getAll(group.TraitNodeGroupID))
+            .map((link) => traitCond.getFirst(link.TraitCondID));
+        if (link) {
+            conds.push(traitCond.getFirst(link.TraitCondID));
         }
-        const cond = traitCond.getFirst(link.TraitCondID);
-        if (!cond) {
+        if (conds.length === 0) {
+            return true; // no conditions found, assume unconditional
+        }
+        if (conds.every((cond) => cond === undefined)) {
             return false;
         }
-        // not sure what to check besides spec set at this stage
-        return specSetMember
-            .getAll(cond.SpecSetID)
-            .some((member) => member.ChrSpecializationID === specId);
+        // it appears that conditions may be ORs? or at least the spec subset of them probably is.
+        // hero tree nodes have multiple conditions with distinct (non-overlapping) spec sets.
+        const validSpecs = new Set(conds
+            .filter((cond) => Boolean(cond))
+            .flatMap((cond) => cond.SpecSetID === 0 ? [] : specSetMember.getAll(cond.SpecSetID))
+            .map((member) => member.ChrSpecializationID));
+        return validSpecs.has(specId);
     });
     const traitNodesToEntries = await dbc.loadTable("TraitNodeXTraitNodeEntry", "TraitNodeID");
     const traitEntries = await dbc.loadTable("TraitNodeEntry", "ID");
