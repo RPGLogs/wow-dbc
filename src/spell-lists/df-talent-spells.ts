@@ -126,7 +126,8 @@ export default async function dragonflightTalentSpells(
         )
         .map((member) => member.ChrSpecializationID),
     );
-    return validSpecs.has(specId);
+    // if there are no valid specs, treat it as all specs valid. example: Ring of Peace (Monk class tree)
+    return validSpecs.size === 0 || validSpecs.has(specId);
   });
 
   const traitNodesToEntries = await dbc.loadTable<

@@ -39,7 +39,8 @@ export default async function dragonflightTalentSpells(dbc, classId, specId) {
             .filter((cond) => Boolean(cond))
             .flatMap((cond) => cond.SpecSetID === 0 ? [] : specSetMember.getAll(cond.SpecSetID))
             .map((member) => member.ChrSpecializationID));
-        return validSpecs.has(specId);
+        // if there are no valid specs, treat it as all specs valid. example: Ring of Peace (Monk class tree)
+        return validSpecs.size === 0 || validSpecs.has(specId);
     });
     const traitNodesToEntries = await dbc.loadTable("TraitNodeXTraitNodeEntry", "TraitNodeID");
     const traitEntries = await dbc.loadTable("TraitNodeEntry", "ID");
