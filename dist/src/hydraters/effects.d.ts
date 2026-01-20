@@ -48,6 +48,7 @@ declare const _default: import("./internal/types.ts").Hydrater<EffectsOutput, {
 export default _default;
 export declare const EffectType: {
     PERIODIC_TRIGGER_SPELL: number;
+    TRIGGER_SPELL: number;
     APPLY_GLYPH: number;
     ADD_FLAT_MODIFIER: number;
     ADD_PCT_MODIFIER: number;

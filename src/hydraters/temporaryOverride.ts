@@ -32,6 +32,13 @@ export default hydrater({
         override.EffectBasePointsF === input.id ||
         override.EffectBasePoints === input.id
       ) {
+        if (override.EffectMiscValue_0 > 0) {
+          const target = allSpells.get(override.EffectMiscValue_0);
+          if (target) {
+            return { overrides: target.id };
+          }
+        }
+
         const overriddenSpells = allSpells
           .values()
           .filter((spell) =>

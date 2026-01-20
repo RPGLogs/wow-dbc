@@ -77,6 +77,7 @@ function matchesCategory(effect, category) {
 // see: https://github.com/Marlamin/wow.tools.local/blob/d9872d652157b720a24cc7db96543d01a7d50b29/wwwroot/js/enums.js#L1698
 export const EffectType = {
     PERIODIC_TRIGGER_SPELL: 23,
+    TRIGGER_SPELL: 64,
     APPLY_GLYPH: 74,
     ADD_FLAT_MODIFIER: 107,
     ADD_PCT_MODIFIER: 108,
