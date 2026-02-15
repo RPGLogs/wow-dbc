@@ -58,6 +58,7 @@ export declare const EffectType: {
     MOD_MAX_CHARGES: number;
     MOD_COOLDOWN_BY_HASTE: number;
     MOD_GCD_BY_HASTE: number;
+    CHARGE_RECOVERY_FLAT_MOD: number;
     CHARGE_RECOVERY_MULTIPLIER: number;
     CHARGE_RECOVERY_BY_HASTE: number;
 };

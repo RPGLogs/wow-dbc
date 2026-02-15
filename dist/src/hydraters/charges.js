@@ -39,6 +39,12 @@ export default hydrater({
             };
         });
         const cooldown = effectWithModifiers(spellList, input, { duration: categoryDefinition.ChargeRecoveryTime, hasted: false }, (acc, effect) => {
+            if (effect.aura === EffectType.CHARGE_RECOVERY_FLAT_MOD) {
+                return {
+                    ...acc,
+                    duration: (acc?.duration ?? 0) + effect.basePoints,
+                };
+            }
             if (effect.aura === EffectType.CHARGE_RECOVERY_MULTIPLIER) {
                 return {
                     ...acc,

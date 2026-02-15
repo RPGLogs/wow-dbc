@@ -87,6 +87,7 @@ export const EffectType = {
     MOD_MAX_CHARGES: 411,
     MOD_COOLDOWN_BY_HASTE: 416,
     MOD_GCD_BY_HASTE: 417,
+    CHARGE_RECOVERY_FLAT_MOD: 453,
     CHARGE_RECOVERY_MULTIPLIER: 454,
     CHARGE_RECOVERY_BY_HASTE: 457,
 };
@@ -132,6 +133,7 @@ const effectIndexLookup = {
 };
 const effectCategoryTypes = {
     [EffectType.MOD_MAX_CHARGES]: "ChargeCategory",
+    [EffectType.CHARGE_RECOVERY_FLAT_MOD]: "ChargeCategory",
     [EffectType.CHARGE_RECOVERY_MULTIPLIER]: "ChargeCategory",
     [EffectType.CHARGE_RECOVERY_BY_HASTE]: "ChargeCategory",
 };
